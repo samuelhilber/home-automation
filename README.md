@@ -1,1 +1,43 @@
-# home-automation
+# Home Automation 1.0
+
+A personal home-automation setup built around a Sony A95K TV, Sonos speakers and an iPhone, with Home Assistant on a Raspberry Pi as the hub.
+
+Goal 1 for the 1.0 release:
+
+- A new landing page on the TV.
+- Alarms managed in Home Assistant: the alarm plays on Sonos, switches the TV on and shows the weather and the schedule (Apple Calendar + Outlook).
+- Control from the iPhone, also from outside the home (Tailscale).
+- One overview of the last-watched shows and anime, with a flag when a new episode is available.
+
+## Documentation
+
+The project documentation is written as a living doc on claude.ai and versioned here as PDF exports.
+
+| Version | Date | File |
+| --- | --- | --- |
+| v0.1 | 2026-11-03 | [docs/versions/2026-11-03_v0.1_project-documentation.pdf](docs/versions/2026-11-03_v0.1_project-documentation.pdf) |
+
+The doc holds the requirements, the decision log (ADRs), the architecture, risks, open questions, the build plan, setup guides and a glossary. What changed between versions is listed in [CHANGELOG.md](CHANGELOG.md).
+
+Later, the documentation moves into Markdown files in this repository (see ADR-009).
+
+## Repository structure
+
+```
+home-automation/
+├── README.md          Project overview (this file)
+├── CHANGELOG.md       What changed in each documentation version
+└── docs/
+    └── versions/      PDF exports of the project documentation, one per version
+```
+
+Planned:
+
+- `docs/adr/`: one Markdown file per Architecture Decision Record.
+- `homeassistant/`: the Home Assistant configuration, under version control.
+
+## Versioning
+
+- File names follow `YYYY-MM-DD_vX.Y_project-documentation.pdf`.
+- The minor version (0.1 → 0.2) goes up for each documentation update; 1.0 is the release of Goal 1.
+- Every new version gets a line in the table above and an entry in `CHANGELOG.md`.
