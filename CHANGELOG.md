@@ -2,6 +2,15 @@
 
 All notable changes to the project documentation. Newest version first.
 
+## Unreleased
+
+Repository catch-up for decisions already made in the living doc; folds into the v0.3 entry once that PDF is exported.
+
+- ADR-022 (TV loads its pages from the Pi, not from files bundled on the TV) added, mirrored in `docs/adr/`.
+- Decision log ADR-001 to ADR-022 now also kept as Markdown in `docs/adr/` (one file per ADR), alongside the PDF.
+- `homeassistant/` configuration skeleton added under version control.
+- UI prototypes for the TV and admin/phone view built and signed off by Samuel (`prototypes/`).
+
 ## v0.2 – 2026-11-03
 
 Hardware bought, alarm safety net and update rules decided.

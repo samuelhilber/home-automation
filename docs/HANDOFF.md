@@ -4,14 +4,15 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 
 ## Done
 
-- Planning: requirements R1–R19, decisions ADR-001 to ADR-021 (newest PDF in `docs/versions/`).
-- Hardware bought: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case. Storage: SanDisk Extreme Portable SSD 1 TB, already emptied (Home Assistant OS will wipe it anyway).
+- Planning: requirements R1–R19, decisions ADR-001 to ADR-022 (newest PDF in `docs/versions/`; ADR-022 also mirrored in `docs/adr/`).
+- Hardware bought: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case; on order, not arrived. Storage: SanDisk Extreme Portable SSD 1 TB, already emptied (Home Assistant OS will wipe it anyway).
 - Sony TV: storage freed up.
 - Sonos: UPnP is on. The backup alarm exists in the Sonos app at **04:44**, switched **off**. Once Home Assistant runs, find it by that time, label it "Backup" and take it over (ADR-020).
+- UI prototypes for the TV (`prototypes/tv-kiosk/`) and the admin/phone view (`prototypes/admin/`) built and signed off by Samuel. Still inline-styled HTML; need a React rewrite with CSS/JS in their own files before real use (common coding guideline), and the TV hasn't been tested with React yet.
+- `homeassistant/` configuration skeleton (folders, minimal `configuration.yaml`, `secrets.yaml.example`) added under version control.
 
 ## On hold
 
-- **UI sketch:** Samuel is doing his own design research first and may add design skills. Do not start sketches or mockups until he says so.
 - **PDF exports:** only when Samuel explicitly asks. Exports are expensive; keep work token-efficient.
 
 ## Open (Samuel)
@@ -24,7 +25,7 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 - Watch overview for Netflix, Disney+, Prime Video, Apple TV+ and HBO Max: Trakt VIP or self-built fetchers. Research before build step 7.
 - Choose the watchdog service (ADR-021) during the build.
 
-## Next build steps (after the sketch is reviewed)
+## Next build steps
 
 1. Install Home Assistant OS on the SSD (Raspberry Pi Imager on Samuel's Windows PC), boot the Pi.
 2. Put the configuration under Git in `homeassistant/`, set up Tailscale, nightly backups.

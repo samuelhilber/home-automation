@@ -31,14 +31,13 @@ home-automation/
 ├── CLAUDE.md          Guidance for Claude Code: rules, key decisions, conventions
 ├── README.md          Project overview (this file)
 ├── CHANGELOG.md       What changed in each documentation version
-└── docs/
-    └── versions/      PDF exports of the project documentation, one per version
+├── docs/
+│   ├── versions/      PDF exports of the project documentation, one per version
+│   ├── adr/           One Markdown file per Architecture Decision Record
+│   └── HANDOFF.md      Where things stand and what comes next
+├── homeassistant/     The Home Assistant configuration, under version control
+└── prototypes/        UI prototypes (tv-kiosk, admin)
 ```
-
-Planned:
-
-- `docs/adr/`: one Markdown file per Architecture Decision Record.
-- `homeassistant/`: the Home Assistant configuration, under version control.
 
 ## Versioning
 
