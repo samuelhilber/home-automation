@@ -76,4 +76,4 @@ Planned (create only when the build step gets there):
 
 ## Current status
 
-Planning is done; hardware is bought. Next step: the UI sketch (TV landing page, morning screen, phone alarm screen) for Samuel's review. Then: install Home Assistant OS, put the configuration under Git, set up Tailscale. See the build plan in the newest documentation PDF.
+Planning is done; hardware is bought. The UI sketch is **on hold** until Samuel has done his own design research. PDF exports only on Samuel's explicit request. Details, open items and the backend spec for the mockup: [`docs/HANDOFF.md`](docs/HANDOFF.md).
