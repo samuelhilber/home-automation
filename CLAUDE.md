@@ -17,7 +17,8 @@ Single user (Samuel). Low running cost matters.
 
 ## Where things are decided
 
-- The **project documentation** (requirements R1–R19, decision log ADR-001 to ADR-021, risks, open questions, build plan) is a living doc on claude.ai. It is the single source of truth. Each version is exported as a PDF to `docs/versions/`; read the newest one before changing anything that touches a decision.
+- The **project documentation** (requirements R1–R19, decision log ADR-001 to ADR-022, risks, open questions, build plan) is a living doc on claude.ai. It is the single source of truth. Each version is exported as a PDF to `docs/versions/`; read the newest one before changing anything that touches a decision.
+- Decisions are also mirrored as Markdown in `docs/adr/`, one file per ADR.
 - `CHANGELOG.md` summarises what changed between documentation versions.
 - If something here contradicts the newest PDF, the PDF wins. Point out the conflict instead of guessing.
 
@@ -43,7 +44,7 @@ If a task seems to need any of this, ask Samuel to provide it locally (e.g. in `
 - **Alarms:** Home Assistant owns them; Sonos only plays sound (ADR-002). Several alarms on single weekdays or custom weekday groups, no snooze; stop via Sonos button (pause detection), phone, or after 15 minutes (ADR-004). Skip St. Gallen public holidays via the Workday integration (ADR-012).
 - **Music:** Home Assistant starts the Spotify playlist directly and plays it on the chosen Sonos zone; fixed volume (ADR-014). Starting a Sonos favourite (ADR-013) was rejected.
 - **Alarm safety net:** one Sonos alarm stored on the speaker as backup, synced nightly to 10 minutes after the next alarm, switched off by Home Assistant only after the real alarm was stopped (ADR-020). Sonos alarms have no names: Home Assistant finds the backup by its internal alarm ID and labels it "Backup", so never match it by name or create a second one. A watchdog with an outside dead-man's-switch service (ADR-021). Never weaken these.
-- **TV:** Fully Kiosk shows the dashboards (ADR-006); normal Google TV home screen in 1.0, Projectivy only in 2.0 (ADR-015). The morning screen stays on at most 15 minutes, less when Samuel leaves home (ADR-011). All TV commands go through one script, so a broken integration is fixed in one place.
+- **TV:** Fully Kiosk shows the dashboards (ADR-006); normal Google TV home screen in 1.0, Projectivy only in 2.0 (ADR-015). The morning screen stays on at most 15 minutes, less when Samuel leaves home (ADR-011). All TV commands go through one script, so a broken integration is fixed in one place. The TV loads its pages from the Pi, not from files bundled on the TV itself (ADR-022).
 - **Calendars:** iCloud plus two Outlook accounts (work, school), chosen in a management web app and merged into one view; a per-event preview switch, new events shown by default (R4, R5, ADR-010, ADR-016). Nothing gets marked inside the calendar apps.
 - **Updates:** never automatic. A pop-up in the management web app announces them; Samuel confirms each one. Nothing installs from 21:00 until 2 hours after the last alarm (10:00 on days without one) (ADR-018, ADR-019).
 - **Remote access:** Tailscale only (ADR-008). Home Assistant is never exposed to the public internet; no port forwarding (there is no router access anyway).
@@ -57,14 +58,13 @@ home-automation/
 ├── CLAUDE.md          This file
 ├── README.md          Project overview and documentation version table
 ├── CHANGELOG.md       What changed in each documentation version
-└── docs/
-    └── versions/      PDF exports of the project documentation
+├── docs/
+│   ├── versions/      PDF exports of the project documentation
+│   ├── adr/           One Markdown file per ADR, NNN-short-title.md
+│   └── HANDOFF.md      Where things stand and what comes next
+├── homeassistant/     The Home Assistant configuration under version control
+└── prototypes/        UI prototypes (tv-kiosk, admin), signed off by Samuel; still inline-styled HTML, to be rewritten in React before real use
 ```
-
-Planned (create only when the build step gets there):
-
-- `docs/adr/`: one Markdown file per ADR, `NNN-short-title.md`.
-- `homeassistant/`: the Home Assistant configuration under version control.
 
 ## Conventions
 
@@ -76,4 +76,4 @@ Planned (create only when the build step gets there):
 
 ## Current status
 
-Planning is done; hardware is bought. The UI sketch is **on hold** until Samuel has done his own design research. PDF exports only on Samuel's explicit request. Details, open items and the backend spec for the mockup: [`docs/HANDOFF.md`](docs/HANDOFF.md).
+Planning is done; hardware is bought and the Raspberry Pi is on order. UI prototypes for the TV and the admin/phone view are built and signed off by Samuel (`prototypes/`); they still need a React rewrite with CSS/JS in their own files before real use. PDF exports only on Samuel's explicit request. Details, open items and the backend spec for the mockup: [`docs/HANDOFF.md`](docs/HANDOFF.md).
