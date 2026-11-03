@@ -1,0 +1,485 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Morgen Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* layout: fixed 1920×1080 kiosk stage, scaled to the screen (2× on the 4K TV); see-through panels over the pixel forest */
+  :root{
+    --bg:#0a110c;
+    --panel:rgba(12,21,15,.66);
+    --panel-inner:rgba(4,9,6,.42);
+    --line:rgba(160,190,168,.24);
+    --line-live:rgba(124,242,155,.55);
+    --accent:#7cf29b;
+    --accent-fill:#56c96d;
+    --accent-ink:#06150c;
+    --grey-fill:#8a948c;
+    --text:#e8f1e6;
+    --muted:#a3b4a8;
+    --faint:#7d9083;
+    --veil-top:rgba(4,8,6,.10);
+    --veil-bottom:rgba(4,8,6,.38);
+    --font:'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    color-scheme: dark;
+  }
+  /* brighter skies get denser panels and a heavier veil so text keeps its contrast */
+  :root[data-scene="sunrise"]{--panel:rgba(10,19,13,.76); --panel-inner:rgba(4,9,6,.5); --veil-top:rgba(4,8,6,.22); --veil-bottom:rgba(4,8,6,.40)}
+  :root[data-scene="noon"]{--panel:rgba(9,18,12,.82); --panel-inner:rgba(4,9,6,.55); --veil-top:rgba(4,10,6,.30); --veil-bottom:rgba(4,10,6,.45)}
+  :root[data-scene="sunset"]{--panel:rgba(12,18,15,.72); --veil-top:rgba(6,6,10,.16); --veil-bottom:rgba(6,6,10,.40)}
+  *{box-sizing:border-box}
+  html,body{height:100%; overflow:hidden}
+  body{
+    margin:0; cursor:none;
+    background:var(--bg);
+    color:var(--text); font-family:var(--font);
+    -webkit-font-smoothing:antialiased;
+  }
+  .sky{position:fixed; inset:0}
+  .sky div{position:absolute; inset:0; background:center / cover no-repeat; opacity:0; transition:opacity 90s linear}
+  .sky div.on{opacity:1}
+  .sky::after{content:""; position:absolute; inset:0; background:linear-gradient(180deg, var(--veil-top), var(--veil-bottom)); transition:background 90s linear}
+  .panel{transition:background-color 90s linear}
+  .cycle .sky div, .cycle .sky::after, .cycle .panel{transition-duration:4s}
+  .instant .sky div, .instant .sky::after, .instant .panel{transition:none !important}
+  @media (prefers-reduced-motion: reduce){ .sky div, .sky::after, .panel{transition:none} }
+
+  .screen{
+    position:fixed; inset:0; z-index:1;
+    padding-left:max(16px, env(safe-area-inset-left,0px));
+    padding-right:max(16px, env(safe-area-inset-right,0px));
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stage{
+    width:1920px; height:1080px; flex:none; padding:28px;
+    transform-origin:center center; transform:scale(var(--s,1)) translate(var(--dx,0px), var(--dy,0px));
+    display:grid; gap:20px;
+    grid-template-columns:2fr 3fr 1fr;
+    grid-template-rows:44fr 56fr;
+    grid-template-areas:
+      "weather calendar calendar"
+      "series  today    side";
+  }
+  .tabular{font-variant-numeric:tabular-nums}
+
+  /* ---- panel ---- */
+  .panel{
+    position:relative; overflow:hidden; min-height:0;
+    background:var(--panel); border:1px solid var(--line); border-radius:4px;
+    padding:24px 26px; display:flex; flex-direction:column;
+  }
+  .panel.live{border-color:var(--line-live)}
+  .head{display:flex; align-items:center; gap:12px; font-size:15px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent)}
+  .head::before{content:""; width:12px; height:12px; background:var(--accent); flex:none}
+  .pill{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 8px; background:var(--accent-fill); color:var(--accent-ink)}
+  .rule{height:2px; background:var(--line); border:0; margin:20px 0}
+  .egg{position:absolute; right:18px; bottom:14px; width:32px; height:40px; image-rendering:pixelated; pointer-events:none}
+  .icon{width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:square; stroke-linejoin:miter}
+
+  /* ---- weather ---- */
+  .p-weather{grid-area:weather}
+  .now{display:flex; gap:26px; align-items:center; margin-top:22px}
+  .now-icon{width:118px; height:118px; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:70px; color:var(--text); flex:none; background:var(--panel-inner)}
+  .temp{font-size:92px; font-weight:800; line-height:.95; color:var(--accent); letter-spacing:-.02em}
+  .cond{font-size:20px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin:8px 0 14px}
+  .meta{display:flex; gap:28px}
+  .meta div{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint)}
+  .meta b{display:block; font-size:19px; letter-spacing:0; text-transform:none; color:var(--text); font-weight:600; margin-top:3px}
+  .forecast{display:grid; grid-template-columns:repeat(7,1fr); text-align:center}
+  .forecast .d{font-size:13px; letter-spacing:.1em; color:var(--faint); display:flex; flex-direction:column; align-items:center; gap:8px}
+  .forecast .icon{font-size:30px; color:var(--text)}
+  .forecast b{font-size:20px; color:var(--text); font-weight:700; letter-spacing:0}
+  .forecast .lo{font-size:15px; letter-spacing:0; margin-top:-4px}
+
+  /* ---- calendar ---- */
+  .p-calendar{grid-area:calendar}
+  .strip{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-top:22px}
+  .strip .day{display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 0 12px; font-size:13px; letter-spacing:.1em; color:var(--faint)}
+  .strip .day b{font-size:34px; font-weight:700; color:var(--text); letter-spacing:0; line-height:1.1}
+  .strip .day .mk{width:4px; height:4px; background:var(--faint); margin-top:4px}
+  .strip .day .mk.has{width:8px; height:8px; background:var(--accent)}
+  .strip .day.today{background:var(--accent-fill); color:var(--accent-ink)}
+  .strip .day.today b{color:var(--accent-ink)}
+  .strip .day .tag{font-size:11px; font-weight:700; letter-spacing:.12em; margin-top:2px}
+  .events{display:flex; flex-direction:column; gap:10px}
+  .event{display:grid; grid-template-columns:170px 1fr; align-items:center; gap:16px; font-size:14px; color:var(--faint); letter-spacing:.04em}
+  .bar{height:38px; display:flex; align-items:center; padding:0 16px; font-size:17px; font-weight:700; letter-spacing:.01em; background:var(--accent-fill); color:var(--accent-ink)}
+  .bar::before{content:"▶"; font-size:11px; margin-right:12px}
+  .bar.grey{background:var(--grey-fill)}
+  .bar.outline{background:transparent; color:var(--text); border:2px solid var(--accent-fill)}
+  .legend{display:flex; gap:28px; font-size:13px; color:var(--faint)}
+  .legend span{display:inline-flex; align-items:center; gap:10px}
+  .legend i{width:10px; height:10px; background:var(--accent-fill)}
+  .legend i.grey{background:var(--grey-fill)}
+
+  /* ---- series ---- */
+  .p-series{grid-area:series}
+  .p-series .head .pill{margin-left:4px}
+  .comment{font-size:14px; color:var(--faint); margin:12px 0 16px}
+  .shows{display:flex; flex-direction:column; gap:10px}
+  .show{display:grid; grid-template-columns:48px 1fr; gap:18px; align-items:center; padding:10px 18px 10px 14px; background:var(--panel-inner); border-left:3px solid var(--faint)}
+  .show.on{border-left-color:var(--accent-fill)}
+  .show .box{width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:21px; border:2px solid var(--line); color:var(--faint)}
+  .show.on .box{background:var(--accent-fill); border-color:var(--accent-fill); color:var(--accent-ink)}
+  .show.paused .box{background:var(--grey-fill); border-color:var(--grey-fill); color:var(--accent-ink)}
+  .show .title{font-size:21px; font-weight:700}
+  .show .sub{display:flex; align-items:center; gap:12px; font-size:14px; color:var(--faint); margin:3px 0 8px; letter-spacing:.04em}
+  .tag{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px}
+  .tag.on{background:var(--accent-fill); color:var(--accent-ink)}
+  .tag.grey{background:var(--grey-fill); color:var(--accent-ink)}
+  .tag.ghost{border:1px solid var(--faint); color:var(--muted)}
+  .track{height:6px; background:rgba(160,190,168,.18)}
+  .track span{display:block; height:100%; background:var(--accent-fill)}
+  .track span.grey{background:var(--grey-fill)}
+  .embed{margin-top:14px; padding:11px 16px; border:1px solid var(--line-live); font-size:14px; color:var(--muted); display:flex; align-items:center; gap:12px}
+  .embed::before{content:""; width:4px; height:16px; background:var(--accent)}
+
+  /* ---- today ---- */
+  .p-today{grid-area:today}
+  .hours{display:flex; flex-direction:column; margin-top:16px; flex:1; min-height:0}
+  .hour{flex:1; display:grid; grid-template-columns:86px 1fr; align-items:center; gap:14px; border-bottom:1px solid var(--line); font-size:15px; color:var(--faint); position:relative}
+  .hour:last-child{border-bottom:0}
+  .hour .bar{height:34px; font-size:16px}
+  .hour.now time{color:var(--accent); font-weight:700}
+  .hour.now::before{content:""; position:absolute; left:-26px; top:20%; bottom:20%; width:4px; background:var(--accent)}
+
+  /* ---- side column ---- */
+  .side{grid-area:side; display:flex; flex-direction:column; gap:20px; min-height:0}
+  .clock{flex:.9; padding:20px 22px; align-items:center; justify-content:center; text-align:center}
+  .clock .head{align-self:flex-start}
+  .clock .time{font-size:88px; font-weight:800; color:var(--accent); line-height:1; margin-top:8px; letter-spacing:-.01em}
+  .clock .date{font-size:20px; color:var(--muted); margin-top:10px}
+  .ticks{display:flex; gap:6px; margin-top:12px}
+  .ticks i{width:12px; height:12px; background:rgba(160,190,168,.22)}
+  .ticks i.on{background:var(--accent-fill)}
+  .clock .foot{font-size:13px; color:var(--faint); margin-top:10px; letter-spacing:.04em}
+
+  .player{flex:1.1; padding:20px 22px; gap:14px}
+  .np{display:flex; gap:16px; align-items:center}
+  .art{width:84px; height:84px; flex:none; border:2px solid var(--accent-fill); display:flex; align-items:center; justify-content:center; background:var(--panel-inner)}
+  .art i{width:62px; height:62px; border-radius:50%; background:radial-gradient(circle, var(--accent-fill) 0 13%, var(--panel-inner) 14% 32%, var(--accent-fill) 33% 100%)}
+  .np .t{min-width:0}
+  .np .song{font-size:18px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .np .artist{font-size:14px; color:var(--muted); margin-top:3px}
+  .np .list{font-size:13px; color:var(--accent); margin-top:5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .prog{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--faint)}
+  .prog .track{flex:1}
+  .ctl{display:flex; justify-content:center; gap:14px}
+  .ctl span{width:42px; height:42px; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--text)}
+  .ctl span.main{background:var(--accent-fill); border-color:var(--accent-fill); color:var(--accent-ink); width:52px}
+  .player .foot{font-size:12px; color:var(--faint)}
+
+  @media (prefers-reduced-motion: reduce){ .stage{transition:none} }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10.5a4 4 0 0 0 .5-8 6 6 0 0 0-11.5-1.5A4.5 4.5 0 0 0 7 18z"/></symbol>
+  <symbol id="i-cloud-sun" viewBox="0 0 24 24"><path d="M9 20h8.5a3.5 3.5 0 0 0 .4-7 5 5 0 0 0-9.6-1.2A4 4 0 0 0 9 20z"/><path d="M5.2 9.6A3.5 3.5 0 0 1 10.6 5"/><line x1="7" y1="2" x2="7" y2="3.2"/><line x1="2" y1="7" x2="3.2" y2="7"/><line x1="3.4" y1="3.4" x2="4.2" y2="4.2"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15h10.5a4 4 0 0 0 .5-8 6 6 0 0 0-11.5-1.5A4.5 4.5 0 0 0 7 15z"/><line x1="8" y1="18" x2="7" y2="21"/><line x1="12" y1="18" x2="11" y2="21"/><line x1="16" y1="18" x2="15" y2="21"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><line x1="12" y1="2.5" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21.5"/><line x1="2.5" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21.5" y2="12"/><line x1="5.3" y1="5.3" x2="7" y2="7"/><line x1="17" y1="17" x2="18.7" y2="18.7"/><line x1="5.3" y1="18.7" x2="7" y2="17"/><line x1="17" y1="7" x2="18.7" y2="5.3"/></symbol>
+</svg>
+
+<div class="sky" aria-hidden="true">
+  <div data-scene="sunrise" style="background-image:url('assets/bg-sunrise.jpg')"></div>
+  <div data-scene="noon" style="background-image:url('assets/bg-noon.jpg')"></div>
+  <div data-scene="sunset" style="background-image:url('assets/bg-sunset.jpg')"></div>
+  <div data-scene="midnight" class="on" style="background-image:url('assets/bg-midnight.jpg')"></div>
+</div>
+
+<div class="screen">
+  <main class="stage" id="stage">
+
+    <section class="panel p-weather">
+      <div class="head">Wetter &mdash; St. Gallen &middot; MeteoSchweiz</div>
+      <div class="now">
+        <div class="now-icon"><svg class="icon"><use href="#i-cloud"/></svg></div>
+        <div>
+          <div class="temp tabular">12&deg;C</div>
+          <div class="cond">Bedeckt</div>
+          <div class="meta tabular">
+            <div>Wind<b>18 km/h</b></div>
+            <div>Regen<b>40 %</b></div>
+            <div>Luftf.<b>78 %</b></div>
+            <div>Gef&uuml;hlt<b>9 &deg;C</b></div>
+          </div>
+        </div>
+      </div>
+      <hr class="rule">
+      <div class="forecast tabular" id="forecast">
+        <div class="d"><span>MI</span><svg class="icon"><use href="#i-cloud-sun"/></svg><b>14&deg;</b><span class="lo">9&deg;</span></div>
+        <div class="d"><span>DO</span><svg class="icon"><use href="#i-rain"/></svg><b>10&deg;</b><span class="lo">6&deg;</span></div>
+        <div class="d"><span>FR</span><svg class="icon"><use href="#i-rain"/></svg><b>9&deg;</b><span class="lo">5&deg;</span></div>
+        <div class="d"><span>SA</span><svg class="icon"><use href="#i-cloud-sun"/></svg><b>13&deg;</b><span class="lo">7&deg;</span></div>
+        <div class="d"><span>SO</span><svg class="icon"><use href="#i-sun"/></svg><b>17&deg;</b><span class="lo">9&deg;</span></div>
+        <div class="d"><span>MO</span><svg class="icon"><use href="#i-sun"/></svg><b>19&deg;</b><span class="lo">11&deg;</span></div>
+        <div class="d"><span>DI</span><svg class="icon"><use href="#i-cloud-sun"/></svg><b>15&deg;</b><span class="lo">8&deg;</span></div>
+      </div>
+      <img class="egg" src="assets/egg-asta.png" alt="">
+    </section>
+
+    <section class="panel p-calendar">
+      <div class="head" id="cal-head">Kalender &mdash; 03.&ndash;09.11.2026</div>
+      <div class="strip tabular" id="strip">
+        <div class="day today">DI<b>03</b><span class="tag">HEUTE</span></div>
+        <div class="day">MI<b>04</b><span class="mk"></span></div>
+        <div class="day">DO<b>05</b><span class="mk has"></span></div>
+        <div class="day">FR<b>06</b><span class="mk"></span></div>
+        <div class="day">SA<b>07</b><span class="mk"></span></div>
+        <div class="day">SO<b>08</b><span class="mk has"></span></div>
+        <div class="day">MO<b>09</b><span class="mk"></span></div>
+      </div>
+      <hr class="rule">
+      <div class="events tabular">
+        <div class="event"><span><span data-evday>DI 03</span> &middot; 08:00</span><div class="bar">Stand-up Meeting</div></div>
+        <div class="event"><span><span data-evday>DI 03</span> &middot; 10:00</span><div class="bar grey">Projektreview</div></div>
+        <div class="event"><span><span data-evday>DI 03</span> &middot; 14:00</span><div class="bar">Design Sync</div></div>
+      </div>
+      <hr class="rule">
+      <div class="legend"><span><i></i>Termin (Demo)</span><span><i class="grey"></i>Wichtig</span></div>
+      <img class="egg" src="assets/egg-ichigo.png" alt="">
+    </section>
+
+    <section class="panel live p-series">
+      <div class="head">Serien-Tracker <span class="pill">Einbettung</span></div>
+      <div class="comment">// Eigene Web-App &ndash; vorgesehener Einbettungsbereich</div>
+      <div class="shows">
+        <div class="show on">
+          <div class="box">&#9654;</div>
+          <div><div class="title">Stranger Things</div><div class="sub tabular">S04 E08 <span class="tag on">Am schauen</span></div><div class="track"><span style="width:28%"></span></div></div>
+        </div>
+        <div class="show paused">
+          <div class="box">&#9632;</div>
+          <div><div class="title">The Bear</div><div class="sub tabular">S03 E05 <span class="tag grey">Pausiert</span></div><div class="track"><span class="grey" style="width:14%"></span></div></div>
+        </div>
+        <div class="show on">
+          <div class="box">&#10003;</div>
+          <div><div class="title">Severance</div><div class="sub tabular">S02 fertig <span class="tag on">Abgeschlossen</span></div><div class="track"><span style="width:45%"></span></div></div>
+        </div>
+        <div class="show">
+          <div class="box">&#9675;</div>
+          <div><div class="title">Fallout</div><div class="sub tabular">S01 ausstehend <span class="tag ghost">Warteliste</span></div><div class="track"><span style="width:0"></span></div></div>
+        </div>
+      </div>
+      <div class="embed">Web-App-URL hier einbinden &middot; Demo-Daten sichtbar</div>
+      <img class="egg" src="assets/egg-asta.png" alt="">
+    </section>
+
+    <section class="panel p-today">
+      <div class="head" id="today-head">Heute &mdash; Di 03.11.</div>
+      <div class="hours tabular" id="hours">
+        <div class="hour" data-h="8"><time>08:00</time><div class="bar">Stand-up Meeting</div></div>
+        <div class="hour" data-h="9"><time>09:00</time></div>
+        <div class="hour" data-h="10"><time>10:00</time><div class="bar grey">Projektreview</div></div>
+        <div class="hour" data-h="11"><time>11:00</time></div>
+        <div class="hour" data-h="12"><time>12:00</time><div class="bar outline">Mittagspause</div></div>
+        <div class="hour" data-h="13"><time>13:00</time></div>
+        <div class="hour" data-h="14"><time>14:00</time><div class="bar">Design Sync</div></div>
+        <div class="hour" data-h="15"><time>15:00</time></div>
+        <div class="hour" data-h="16"><time>16:00</time></div>
+        <div class="hour" data-h="17"><time>17:00</time><div class="bar outline" style="max-width:62%">Feierabend &#10003;</div></div>
+      </div>
+      <img class="egg" src="assets/egg-ichigo.png" alt="">
+    </section>
+
+    <div class="side">
+      <section class="panel clock">
+        <div class="head">Uhrzeit</div>
+        <div class="time tabular" id="time">20:47</div>
+        <div class="date tabular" id="date">Di, 03.11.2026</div>
+        <div class="ticks" id="ticks"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+        <div class="foot tabular" id="week">KW 45 &middot; 307. Tag im Jahr</div>
+      </section>
+
+      <section class="panel live player">
+        <div class="head">Spotify <span class="pill">L&auml;uft</span></div>
+        <div class="np">
+          <div class="art"><i></i></div>
+          <div class="t">
+            <div class="song">Blinding Lights</div>
+            <div class="artist">The Weeknd</div>
+            <div class="list">&#9654; Lo-Fi Chill Vibes Mix</div>
+          </div>
+        </div>
+        <div class="prog tabular"><span>2:14</span><div class="track"><span style="width:66%"></span></div><span>3:22</span></div>
+        <div class="ctl"><span>&#9664;&#9664;</span><span class="main">&#10074;&#10074;</span><span>&#9654;&#9654;</span></div>
+        <div class="foot">// Demo &ndash; keine Echtzeit-Daten</div>
+      </section>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var stage = document.getElementById('stage');
+  var W = 1920, H = 1080, scale = 1;
+
+  // the stage's own 28px padding is the gutter once scaled; the 16px outer gutter only kicks in on small screens
+  function fit(){
+    scale = Math.min(window.innerWidth / W, window.innerHeight / H);
+    if (28 * scale < 16){
+      var gutter = parseFloat(getComputedStyle(document.querySelector('.screen')).paddingLeft) || 16;
+      scale = Math.min((window.innerWidth - gutter * 2) / W, window.innerHeight / H);
+    }
+    stage.style.setProperty('--s', scale.toFixed(4));
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var DAYS = ['SO','MO','DI','MI','DO','FR','SA'];
+  var DAYS_TC = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function zurichNow(){
+    var parts = new Intl.DateTimeFormat('en-GB', {
+      timeZone:'Europe/Zurich', year:'numeric', month:'2-digit', day:'2-digit',
+      hour:'2-digit', minute:'2-digit', hourCycle:'h23'
+    }).formatToParts(new Date());
+    var o = {};
+    parts.forEach(function(p){ o[p.type] = p.value; });
+    return { y:+o.year, m:+o.month, d:+o.day, h:+o.hour, min:+o.minute };
+  }
+  function utcDate(y, m, d){ return new Date(Date.UTC(y, m - 1, d)); }
+  function addDays(dt, n){ return new Date(dt.getTime() + n * 86400000); }
+  function isoWeek(dt){
+    var t = new Date(dt.getTime());
+    var day = t.getUTCDay() || 7;
+    t.setUTCDate(t.getUTCDate() + 4 - day);
+    var y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+    return Math.ceil(((t - y0) / 86400000 + 1) / 7);
+  }
+  function dayOfYear(dt){
+    return Math.round((dt - Date.UTC(dt.getUTCFullYear(), 0, 1)) / 86400000) + 1;
+  }
+  function dm(dt){ return pad(dt.getUTCDate()) + '.' + pad(dt.getUTCMonth() + 1) + '.'; }
+
+  // where the sun is calculated; #sunrise, #noon, #sunset or #midnight in the URL pins one scene for review
+  var PLACE = { lat: 47.424, lon: 9.377 };            // St. Gallen
+  var GLOW = 90 * 60000;                              // sunrise scene runs until 90 min after sunrise, sunset scene starts 90 min before sunset
+
+  // solar times for one day (standard sunrise equation, accurate to about a minute)
+  function sunTimes(dayNoonUtc, lat, lon){
+    var RAD = Math.PI / 180, DAY = 86400000, J1970 = 2440588, J2000 = 2451545, J0 = 0.0009;
+    var d = dayNoonUtc / DAY - 0.5 + J1970 - J2000;
+    var lw = -lon * RAD, phi = lat * RAD;
+    var n = Math.round(d - J0 - lw / (2 * Math.PI));
+    var ds = J0 + lw / (2 * Math.PI) + n;
+    var M = RAD * (357.5291 + 0.98560028 * ds);
+    var C = RAD * (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M));
+    var L = M + C + RAD * 102.9372 + Math.PI;
+    var dec = Math.asin(Math.sin(RAD * 23.4397) * Math.sin(L));
+    var jNoon = J2000 + ds + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+    function toMs(j){ return (j + 0.5 - J1970) * DAY; }
+    function at(alt){
+      var w = Math.acos((Math.sin(alt * RAD) - Math.sin(phi) * Math.sin(dec)) / (Math.cos(phi) * Math.cos(dec)));
+      var jSet = J2000 + (J0 + (w + lw) / (2 * Math.PI) + n) + 0.0053 * Math.sin(M) - 0.0069 * Math.sin(2 * L);
+      return { rise: toMs(jNoon - (jSet - jNoon)), set: toMs(jSet) };
+    }
+    var horizon = at(-0.833), civil = at(-6);
+    return { dawn: civil.rise, sunrise: horizon.rise, sunset: horizon.set, dusk: civil.set };
+  }
+
+  var layers = document.querySelectorAll('.sky div');
+  var current = '';
+  var sunDay = '', sun = null;
+  function sceneFor(n){
+    var key = n.y + '-' + n.m + '-' + n.d;
+    if (key !== sunDay){ sun = sunTimes(Date.UTC(n.y, n.m - 1, n.d, 12), PLACE.lat, PLACE.lon); sunDay = key; }
+    var t = Date.now();
+    if (t < sun.dawn) return 'midnight';
+    if (t < sun.sunrise + GLOW) return 'sunrise';
+    if (t < sun.sunset - GLOW) return 'noon';
+    if (t < sun.dusk) return 'sunset';
+    return 'midnight';
+  }
+  function setScene(name, instant){
+    if (name === current) return;
+    var root = document.documentElement;
+    if (instant || !current) root.classList.add('instant');
+    current = name;
+    root.dataset.scene = name;
+    layers.forEach(function(el){ el.classList.toggle('on', el.dataset.scene === name); });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.remove('instant'); }); });
+  }
+  function pinned(){
+    var h = (location.hash || '').slice(1);
+    return ['sunrise','noon','sunset','midnight'].indexOf(h) > -1 ? h : '';
+  }
+  // #cycle steps through all four scenes every 15 s for review on the TV
+  var ORDER = ['sunrise','noon','sunset','midnight'];
+  function cycling(){ return location.hash === '#cycle'; }
+  document.documentElement.classList.toggle('cycle', cycling());
+  setInterval(function(){
+    if (cycling()) setScene(ORDER[(ORDER.indexOf(current) + 1) % ORDER.length]);
+  }, 15000);
+  window.addEventListener('hashchange', function(){
+    document.documentElement.classList.toggle('cycle', cycling());
+    if (!cycling()) setScene(pinned() || sceneFor(zurichNow()), true);
+  });
+
+  var lastDay = '';
+  function tick(){
+    var n;
+    try { n = zurichNow(); } catch(e){ return; }
+
+    if (!cycling()) setScene(pinned() || sceneFor(n));
+    var today = utcDate(n.y, n.m, n.d);
+    var wd = today.getUTCDay();
+
+    document.getElementById('time').textContent = pad(n.h) + ':' + pad(n.min);
+
+    var ticks = document.querySelectorAll('#ticks i');
+    var filled = Math.floor((n.h * 60 + n.min) / 120);
+    ticks.forEach(function(el, i){ el.classList.toggle('on', i < filled); });
+
+    document.querySelectorAll('#hours .hour').forEach(function(el){
+      el.classList.toggle('now', +el.dataset.h === n.h);
+    });
+
+    var key = n.y + '-' + n.m + '-' + n.d;
+    if (key === lastDay) return;
+    lastDay = key;
+
+    document.getElementById('date').textContent = DAYS_TC[wd] + ', ' + dm(today) + n.y;
+    document.getElementById('week').textContent = 'KW ' + isoWeek(today) + ' · ' + dayOfYear(today) + '. Tag im Jahr';
+
+    var end = addDays(today, 6);
+    document.getElementById('cal-head').textContent = 'Kalender — ' + dm(today).slice(0, 3) + '–' + dm(end) + end.getUTCFullYear();
+    document.getElementById('today-head').textContent = 'Heute — ' + DAYS_TC[wd] + ' ' + dm(today);
+
+    var strip = document.getElementById('strip');
+    var html = '';
+    for (var i = 0; i < 7; i++){
+      var dt = addDays(today, i);
+      var has = (i === 2 || i === 5);
+      html += '<div class="day' + (i === 0 ? ' today' : '') + '">' + DAYS[dt.getUTCDay()] +
+        '<b>' + pad(dt.getUTCDate()) + '</b>' +
+        (i === 0 ? '<span class="tag">HEUTE</span>' : '<span class="mk' + (has ? ' has' : '') + '"></span>') + '</div>';
+    }
+    strip.innerHTML = html;
+
+    document.querySelectorAll('[data-evday]').forEach(function(el){ el.textContent = DAYS[wd] + ' ' + pad(n.d); });
+
+    var fc = document.querySelectorAll('#forecast .d > span:first-child');
+    fc.forEach(function(el, i){ el.textContent = DAYS[addDays(today, i + 1).getUTCDay()]; });
+  }
+  tick();
+  setInterval(tick, 10000);
+
+  // OLED care: drift the whole stage a few pixels every few minutes so static edges never sit on the same subpixels
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce){
+    var path = [[0,0],[3,1],[4,-2],[1,-4],[-2,-3],[-4,0],[-3,3],[0,4]];
+    var step = 0;
+    setInterval(function(){
+      step = (step + 1) % path.length;
+      stage.style.setProperty('--dx', path[step][0] + 'px');
+      stage.style.setProperty('--dy', path[step][1] + 'px');
+    }, 180000);
+  }
+})();
+</script>
+
+</body></html>
