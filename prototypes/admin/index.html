@@ -1,0 +1,392 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Morgen Verwaltung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* layout: sidebar app — fixed nav left, card grid right; on phones the nav becomes a bottom tab bar */
+  :root{
+    --bg:#0a110c;
+    --sidebar:#0c140e;
+    --surface:#121d15;
+    --surface-2:#0e1711;
+    --border:#223328;
+    --border-strong:#2f4a38;
+    --accent:#7cf29b;
+    --accent-dim:#3d6b4a;
+    --accent-soft:rgba(124,242,155,.12);
+    --accent-ink:#06150c;
+    --text:#e8f1e6;
+    --muted:#95aa9b;
+    --faint:#5d7064;
+    --font:'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+    --radius:6px;
+    --gutter-l:max(16px, env(safe-area-inset-left,0px));
+    --gutter-r:max(16px, env(safe-area-inset-right,0px));
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased}
+  button{font-family:inherit}
+  ::selection{background:var(--accent-soft); color:var(--accent)}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important} }
+
+  .icon{width:1em; height:1em; display:inline-block; vertical-align:-.15em; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:none}
+  .icon-fill{fill:currentColor; stroke:none}
+  .tabular{font-variant-numeric:tabular-nums}
+  .egg{position:absolute; right:16px; bottom:12px; width:32px; height:40px; image-rendering:pixelated; pointer-events:none}
+  .forest{background:#0a150e url("assets/bg-forest.jpg") center 30% / cover no-repeat}
+
+  .app{display:flex; min-height:100vh}
+
+  /* ---- sidebar ---- */
+  .sidebar{
+    width:232px; flex:none; background:var(--sidebar); border-right:1px solid var(--border);
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column; justify-content:space-between;
+    padding:22px 12px 16px max(12px, env(safe-area-inset-left,0px));
+  }
+  .brand{display:flex; align-items:center; gap:11px; padding:0 8px 20px; border-bottom:1px solid var(--border)}
+  .brand .mark{width:32px; height:32px; border:1.5px solid var(--accent); border-radius:5px; display:flex; align-items:center; justify-content:center; color:var(--accent); font-size:17px}
+  .brand b{display:block; font-size:14px; letter-spacing:.02em}
+  .brand small{display:block; font-size:9.5px; letter-spacing:.14em; color:var(--faint); text-transform:uppercase}
+  .nav-label{font-size:10px; letter-spacing:.13em; color:var(--faint); text-transform:uppercase; padding:18px 10px 8px}
+  .nav{display:flex; flex-direction:column; gap:2px}
+  .nav button{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:none; border:0;
+    border-left:2px solid transparent; border-radius:0 5px 5px 0; color:var(--muted);
+    font-size:13px; font-weight:500; padding:11px 12px; cursor:pointer; transition:background .15s, color .15s;
+  }
+  .nav button .icon{font-size:17px}
+  .nav button:hover{background:var(--surface); color:var(--text)}
+  .nav button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+  .nav button[aria-current="page"]{background:var(--accent-soft); color:var(--accent); font-weight:700; border-left-color:var(--accent)}
+  .device{border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface)}
+  .device .forest{height:96px; position:relative}
+  .device .forest span{position:absolute; left:10px; bottom:8px; font-size:10px; color:#cfe3d4; line-height:1.4}
+  .device-row{display:flex; align-items:center; gap:10px; padding:10px 12px; font-size:11px}
+  .device-row .icon{font-size:16px; color:var(--accent)}
+  .device-row b{display:block; font-size:12px}
+  .device-row small{color:var(--faint); font-size:10px}
+  .online{margin-left:auto; width:7px; height:7px; background:var(--accent); animation:blink 2.6s ease-in-out infinite}
+  @keyframes blink{50%{opacity:.35}}
+
+  /* ---- main ---- */
+  .main{flex:1; min-width:0; display:flex; flex-direction:column}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    padding:18px 32px; border-bottom:1px solid var(--border);
+  }
+  .crumb{display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--muted)}
+  .crumb .icon{font-size:15px; color:var(--accent)}
+  .crumb .sep{color:var(--faint)}
+  .crumb .here{color:var(--text)}
+  .top-right{display:flex; align-items:center; gap:16px}
+  .updates{display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:600; letter-spacing:.03em; padding:5px 10px; border:1px solid #6b5a2a; background:rgba(214,178,84,.08); color:#e2c776; border-radius:4px; cursor:pointer}
+  .updates i{width:6px; height:6px; background:currentColor}
+  .updates:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .who{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--muted)}
+  .avatar{width:30px; height:30px; border:1px solid var(--border-strong); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:var(--text)}
+
+  .content{padding:32px 32px 28px; flex:1}
+  .title-row{display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:28px}
+  .eyebrow-path{font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--accent)}
+  h1{font-size:32px; margin:10px 0 8px; letter-spacing:-.01em; line-height:1.15; text-wrap:balance}
+  .lede{color:var(--muted); font-size:13px; margin:0; max-width:52ch}
+  .clockline{text-align:right; font-size:13px}
+  .clockline small{display:block; color:var(--muted); font-size:11.5px; margin-top:4px}
+
+  .grid{display:grid; grid-template-columns:minmax(0,1.85fr) minmax(0,1fr); gap:20px; margin-bottom:20px}
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); position:relative; overflow:hidden; padding:22px 24px}
+  .card.focus{border-color:var(--accent-dim)}
+  .card:has(> .egg){padding-bottom:58px}
+  .card-head{display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .label{display:inline-flex; align-items:center; gap:9px; font-size:11.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase}
+  .label .icon{font-size:15px; color:var(--accent)}
+  .status{display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:600; padding:4px 9px; border:1px solid var(--accent-dim); background:var(--accent-soft); color:var(--accent); border-radius:3px}
+  .status i{width:6px; height:6px; background:currentColor}
+
+  .alarm{display:flex; align-items:center; gap:32px; margin:30px 0 26px; flex-wrap:wrap}
+  .big{font-size:78px; font-weight:700; color:var(--accent); line-height:.9; letter-spacing:-.02em}
+  .when small{display:block; font-size:10.5px; letter-spacing:.13em; color:var(--faint); text-transform:uppercase}
+  .when b{display:block; font-size:19px; margin:6px 0 8px}
+  .when span{font-size:12.5px; color:var(--muted)}
+  .split{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; border-top:1px solid var(--border); padding-top:18px}
+  .kv small{display:block; font-size:10px; letter-spacing:.13em; color:var(--faint); text-transform:uppercase; margin-bottom:5px}
+  .kv b{font-size:13px; font-weight:500}
+  .link{display:inline-flex; align-items:center; gap:7px; background:none; border:0; padding:0; color:var(--accent); font-size:12.5px; font-weight:600; cursor:pointer}
+  .link .icon{font-size:14px; transition:transform .15s}
+  .link:hover .icon{transform:translateX(3px)}
+  .link:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+
+  .backup-state{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:26px 0 24px}
+  .backup-state b{display:block; font-size:16px; color:var(--accent)}
+  .backup-state span{font-size:11.5px; color:var(--muted)}
+  .backup-state.off b{color:var(--muted)}
+  .switch{width:44px; height:24px; border-radius:12px; background:var(--accent-dim); border:1px solid var(--accent); position:relative; flex:none; cursor:pointer; padding:0; transition:background .2s}
+  .switch i{position:absolute; top:3px; left:23px; width:16px; height:16px; border-radius:50%; background:var(--accent); transition:left .2s, background .2s}
+  .switch[aria-checked="false"]{background:var(--surface-2); border-color:var(--border-strong)}
+  .switch[aria-checked="false"] i{left:3px; background:var(--faint)}
+  .switch:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .backup-time{display:flex; align-items:center; gap:18px; padding-bottom:22px; border-bottom:1px solid var(--border)}
+  .backup-time .t{font-size:40px; font-weight:700; line-height:1}
+  .backup-time small{display:block; font-size:12px; color:var(--text)}
+  .backup-time span{font-size:11.5px; color:var(--muted)}
+  .hint{display:flex; gap:9px; align-items:center; font-size:11.5px; color:var(--muted); margin-top:18px}
+  .hint .icon{font-size:14px}
+
+  .cta{display:grid; grid-template-columns:minmax(0,1.85fr) minmax(0,1fr); padding:0; margin-bottom:20px}
+  .cta-copy{padding:24px}
+  .cta h2{font-size:21px; margin:20px 0 8px}
+  .cta p{font-size:12.5px; color:var(--muted); margin:0 0 22px; max-width:56ch}
+  .btn{display:inline-flex; align-items:center; gap:12px; background:var(--accent); color:var(--accent-ink); border:0; border-radius:4px; padding:14px 20px; font-size:13px; font-weight:700; cursor:pointer; transition:filter .15s, transform .1s; text-align:left}
+  .btn span{flex:1}
+  .btn .icon{font-size:16px}
+  .btn:hover{filter:brightness(1.07)}
+  .btn:active{transform:translateY(1px)}
+  .btn:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+  .cta-art{position:relative; min-height:210px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; border-left:1px solid var(--border)}
+  .cta-art::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,10,7,.15), rgba(5,10,7,.55))}
+  .ready{position:relative; width:112px; height:72px; border:1.5px solid var(--accent); background:rgba(6,14,9,.72); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--accent); font-size:10px; font-weight:700; letter-spacing:.12em}
+  .ready .icon{font-size:20px}
+  .tv-line{position:relative; text-align:center; font-size:12px; color:#dbe9df}
+  .tv-line i{display:inline-block; width:6px; height:6px; background:var(--accent); margin-right:8px; vertical-align:2px}
+  .tv-line small{display:block; font-size:10.5px; color:#9fb7a6; margin-top:4px}
+  .cta-art .egg, .device .forest .egg{opacity:.78}
+  .device .forest .egg{right:10px; bottom:8px}
+
+  .pair{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:22px 0 18px}
+  .tile{border:1px solid var(--border); border-radius:4px; padding:16px}
+  .tile .name{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--muted); margin-bottom:14px}
+  .tile .name .icon{font-size:15px}
+  .tile .state{display:flex; align-items:center; gap:9px; font-size:18px; font-weight:700; color:var(--accent)}
+  .tile .state i{width:7px; height:7px; background:currentColor}
+  .tile .detail{font-size:11px; color:var(--faint); margin-top:8px}
+  .sys-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; font-size:11.5px; color:var(--muted)}
+  .stamp{font-size:10.5px; color:var(--faint)}
+
+  .feed{display:flex; flex-direction:column; gap:18px; margin:22px 0 20px}
+  .feed div{display:grid; grid-template-columns:44px 1fr; gap:10px; font-size:12.5px}
+  .feed time{color:var(--faint); font-size:11.5px; padding-top:1px}
+  .feed b{font-weight:600; display:block}
+  .feed small{font-size:11px; color:var(--faint)}
+
+  .footer{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:16px 32px 24px; font-size:11px; color:var(--faint)}
+  .footer .live{display:inline-flex; align-items:center; gap:8px}
+  .footer .live i{width:6px; height:6px; background:var(--accent)}
+
+  @media (max-width:1100px){
+    .grid, .cta{grid-template-columns:1fr}
+    .cta-art{border-left:0; border-top:1px solid var(--border)}
+  }
+  /* phones and small tablets: one column, the sidebar splits into a menu band on top and the device panel at the end */
+  @media (max-width:860px){
+    .app{flex-direction:column; max-width:560px; margin:0 auto}
+    .sidebar{display:contents}
+    .side-nav{background:var(--sidebar); padding:18px var(--gutter-r) 6px var(--gutter-l)}
+    .brand{border-bottom:0; padding:0}
+    .nav-label{padding:22px 3px 8px}
+    .nav{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin:0 -12px}
+    .nav button{min-height:46px; padding:0 14px; font-size:12.5px}
+    .nav button:last-child{grid-column:1 / -1}
+    .nav .desktop-only{display:none}
+    .main{order:1}
+    .device{order:2; border:0; border-radius:0; background:var(--sidebar); padding:24px var(--gutter-r) max(24px, env(safe-area-inset-bottom,0px)) var(--gutter-l)}
+    .device .forest{height:116px; border-radius:4px}
+    .device-row{padding:16px 0 0}
+    .topbar{padding:14px var(--gutter-r) 14px var(--gutter-l)}
+    .top-right{width:100%; justify-content:space-between}
+    .content{padding:24px var(--gutter-r) 24px var(--gutter-l)}
+    .footer{padding:14px var(--gutter-r) 24px var(--gutter-l)}
+    .btn{width:100%}
+  }
+  @media (max-width:560px){
+    h1{font-size:25px}
+    .title-row{flex-direction:column; align-items:flex-start}
+    .clockline{text-align:left}
+    .big{font-size:62px}
+    .pair{grid-template-columns:1fr}
+    .card{padding:20px}
+  }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sunrise" viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="2" y1="22" x2="22" y2="22"/><polyline points="8 6 12 2 16 6"/><line x1="12" y1="2" x2="12" y2="10"/><line x1="4.2" y1="11.2" x2="5.6" y2="12.6"/><line x1="19.8" y1="11.2" x2="18.4" y2="12.6"/></symbol>
+  <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="12" width="8" height="9" rx="1"/><rect x="3" y="15" width="8" height="6" rx="1"/></symbol>
+  <symbol id="i-alarm" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 14.5 15"/><line x1="5" y1="3" x2="2" y2="6"/><line x1="19" y1="3" x2="22" y2="6"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="1.5"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></symbol>
+  <symbol id="i-monitor-play" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="1.5"/><polygon points="10 8 15 10.5 10 13"/><line x1="8" y1="21" x2="16" y2="21"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="2" x2="9" y2="5"/><line x1="15" y1="2" x2="15" y2="5"/><line x1="9" y1="19" x2="9" y2="22"/><line x1="15" y1="19" x2="15" y2="22"/><line x1="2" y1="9" x2="5" y2="9"/><line x1="2" y1="15" x2="5" y2="15"/><line x1="19" y1="9" x2="22" y2="9"/><line x1="19" y1="15" x2="22" y2="15"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.5" fill="var(--sidebar)"/><circle cx="15" cy="17" r="2.5" fill="var(--sidebar)"/></symbol>
+  <symbol id="i-calendar-import" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1.5"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><polyline points="9.5 15 12 17.5 14.5 15"/><line x1="12" y1="12.5" x2="12" y2="17.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2.5 4 5.5v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10v-6z"/><polyline points="8.5 12 11 14.5 16 9"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="2 13 7 13 9.5 6 14 19 16.5 13 22 13"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><line x1="9" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="9" y1="18" x2="21" y2="18"/><line x1="4" y1="6" x2="5" y2="6"/><line x1="4" y1="12" x2="5" y2="12"/><line x1="4" y1="18" x2="5" y2="18"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/></symbol>
+  <symbol id="i-arrow-up-right" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.5" r="1" class="icon-fill"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="side-nav">
+      <div class="brand">
+        <span class="mark"><svg class="icon"><use href="#i-sunrise"/></svg></span>
+        <span><b>morgen_</b><small>Verwaltung</small></span>
+      </div>
+      <div class="nav-label">Arbeitsbereich</div>
+      <nav class="nav" aria-label="Verwaltung">
+        <button type="button" aria-current="page"><svg class="icon"><use href="#i-dashboard"/></svg>&Uuml;bersicht</button>
+        <button type="button"><svg class="icon"><use href="#i-alarm"/></svg>Wecker</button>
+        <button type="button" class="desktop-only"><svg class="icon"><use href="#i-monitor"/></svg>TV-Anzeige</button>
+        <button type="button"><svg class="icon"><use href="#i-cpu"/></svg>System</button>
+        <button type="button"><svg class="icon"><use href="#i-sliders"/></svg>Einstellungen</button>
+        <button type="button"><svg class="icon"><use href="#i-calendar-import"/></svg>Kalender-Import</button>
+      </nav>
+    </div>
+    <div class="device">
+      <div class="forest"><span>// Ein guter Morgen<br>beginnt am Abend.</span><img class="egg" src="assets/egg-tanjiro.png" alt=""></div>
+      <div class="device-row">
+        <svg class="icon"><use href="#i-cpu"/></svg>
+        <span><b>morgenpi</b><small>morgenpi.local</small></span>
+        <i class="online" title="Online"></i>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb"><svg class="icon"><use href="#i-terminal"/></svg>Morgenbildschirm<span class="sep">/</span><span class="here">&Uuml;bersicht</span></div>
+      <div class="top-right">
+        <button type="button" class="updates"><i></i>2 Updates warten</button>
+        <div class="who"><span class="avatar">AD</span>Admin<svg class="icon"><use href="#i-chevron-down"/></svg></div>
+      </div>
+    </header>
+
+    <main class="content">
+      <div class="title-row">
+        <div>
+          <div class="eyebrow-path">Kontrollzentrum / &Uuml;bersicht</div>
+          <h1>Alles bereit f&uuml;r morgen.</h1>
+          <p class="lede">Dein Morgenbildschirm. Ein Blick auf alles Wichtige.</p>
+        </div>
+        <div class="clockline tabular"><span id="longdate">Dienstag, 03. November 2026</span><small>Systemzeit <span id="systime">20:47</span> &middot; MEZ</small></div>
+      </div>
+
+      <div class="grid">
+        <section class="card focus">
+          <div class="card-head">
+            <span class="label"><svg class="icon"><use href="#i-alarm"/></svg>N&auml;chster Wecker</span>
+            <span class="status"><i></i>Aktiv</span>
+          </div>
+          <div class="alarm">
+            <div class="big tabular">06:30</div>
+            <div class="when"><small>Morgen</small><b>Mittwoch</b><span class="tabular">04. November 2026</span></div>
+          </div>
+          <div class="split">
+            <div class="kv"><small>Zeitzone</small><b>Europe/Zurich &middot; MEZ (UTC+01:00)</b></div>
+            <button type="button" class="link">Wecker verwalten<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          </div>
+          <img class="egg" src="assets/egg-asta.png" alt="">
+        </section>
+
+        <section class="card">
+          <div class="card-head"><span class="label"><svg class="icon"><use href="#i-shield"/></svg>Backup-Wecker</span></div>
+          <div class="backup-state" id="backup">
+            <div><b id="backup-state">Eingeschaltet</b><span id="backup-note">Sicherung ist aktiv</span></div>
+            <button type="button" class="switch" id="backup-switch" role="switch" aria-checked="true" aria-label="Backup-Wecker"><i></i></button>
+          </div>
+          <div class="backup-time">
+            <div class="t tabular">06:35</div>
+            <div><small>Eingestellte Zeit</small><span>5 Min. nach Hauptwecker</span></div>
+          </div>
+          <div class="hint"><svg class="icon"><use href="#i-info"/></svg>Unabh&auml;ngig vom Morgenbildschirm.</div>
+        </section>
+      </div>
+
+      <section class="card cta">
+        <div class="cta-copy">
+          <span class="label"><svg class="icon"><use href="#i-monitor-play"/></svg>Dein TV, dein Morgen</span>
+          <h2>Nicht bis morgen warten.</h2>
+          <p>Starte die Anzeige sofort. Dein Weckplan bleibt unver&auml;ndert.</p>
+          <button type="button" class="btn"><svg class="icon"><use href="#i-play"/></svg><span>Morgenbildschirm jetzt auf dem TV zeigen</span><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+        </div>
+        <div class="cta-art forest">
+          <div class="ready"><svg class="icon"><use href="#i-sunrise"/></svg>BEREIT_</div>
+          <div class="tv-line"><i></i>Wohnzimmer-TV &middot; verbunden<small>HDMI-1 / CEC bereit</small></div>
+          <img class="egg" src="assets/egg-ruffy.png" alt="">
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <div class="card-head">
+            <span class="label"><svg class="icon"><use href="#i-activity"/></svg>Systemstatus</span>
+            <span class="stamp">Zuletzt gepr&uuml;ft vor 12 Sek.</span>
+          </div>
+          <div class="pair">
+            <div class="tile">
+              <div class="name"><svg class="icon"><use href="#i-cpu"/></svg>Raspberry Pi</div>
+              <div class="state"><i></i>Online</div>
+              <div class="detail tabular">Laufzeit 12 Tage, 08 Std.</div>
+            </div>
+            <div class="tile">
+              <div class="name"><svg class="icon"><use href="#i-shield"/></svg>Watchdog</div>
+              <div class="state"><i></i>In Ordnung</div>
+              <div class="detail tabular">Letztes Signal um 20:46:48</div>
+            </div>
+          </div>
+          <div class="sys-foot tabular">
+            <span>CPU 42&nbsp;&deg;C &nbsp;&middot;&nbsp; Speicher 38&nbsp;% &nbsp;&middot;&nbsp; Netz stabil</span>
+            <button type="button" class="link">Details<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><span class="label"><svg class="icon"><use href="#i-list"/></svg>Letzte Aktivit&auml;ten</span></div>
+          <div class="feed tabular">
+            <div><time>20:46</time><span><b>Watchdog gepr&uuml;ft</b><small>Alle Dienste antworten.</small></span></div>
+            <div><time>20:30</time><span><b>Weckplan synchronisiert</b><small>N&auml;chster Start: morgen, 06:30.</small></span></div>
+            <div><time>18:12</time><span><b>Updates gefunden</b><small>2 Pakete zur Installation bereit.</small></span></div>
+          </div>
+          <button type="button" class="link">Protokoll &ouml;ffnen<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          <img class="egg" src="assets/egg-ichigo.png" alt="">
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span class="live"><i></i>Lokal verbunden &middot; morgenpi.local</span>
+      <span>Morgenbildschirm v1.8.2 &middot; Mit Ruhe in den Tag_</span>
+    </footer>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  "use strict";
+  function tick(){
+    try{
+      var now = new Date();
+      document.getElementById('systime').textContent =
+        new Intl.DateTimeFormat('de-DE', { timeZone:'Europe/Zurich', hour:'2-digit', minute:'2-digit' }).format(now);
+      document.getElementById('longdate').textContent =
+        new Intl.DateTimeFormat('de-DE', { timeZone:'Europe/Zurich', weekday:'long', day:'2-digit', month:'long', year:'numeric' }).format(now);
+    }catch(e){}
+  }
+  tick();
+  setInterval(tick, 15000);
+
+  var sw = document.getElementById('backup-switch');
+  sw.addEventListener('click', function(){
+    var on = sw.getAttribute('aria-checked') !== 'true';
+    sw.setAttribute('aria-checked', String(on));
+    document.getElementById('backup').classList.toggle('off', !on);
+    document.getElementById('backup-state').textContent = on ? 'Eingeschaltet' : 'Ausgeschaltet';
+    document.getElementById('backup-note').textContent = on ? 'Sicherung ist aktiv' : 'Keine Sicherung bei Ausfall';
+  });
+})();
+</script>
