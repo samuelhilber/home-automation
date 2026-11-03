@@ -1,0 +1,19 @@
+# Personal, machine-local notes for Claude Code (may hold private network details)
+CLAUDE.local.md
+
+# Home Assistant secrets and runtime state
+secrets.yaml
+**/secrets.yaml
+.storage/
+*.db
+*.db-shm
+*.db-wal
+*.log
+.cloud/
+.HA_VERSION
+
+# Editor and OS clutter
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

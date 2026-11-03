@@ -28,6 +28,7 @@ Later, the documentation moves into Markdown files in this repository (see ADR-0
 
 ```
 home-automation/
+├── CLAUDE.md          Guidance for Claude Code: rules, key decisions, conventions
 ├── README.md          Project overview (this file)
 ├── CHANGELOG.md       What changed in each documentation version
 └── docs/
