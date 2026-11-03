@@ -15,9 +15,12 @@ The project documentation is written as a living doc on claude.ai and versioned 
 
 | Version | Date | File |
 | --- | --- | --- |
+| v0.2 | 2026-11-03 | [docs/versions/2026-11-03_v0.2_project-documentation.pdf](docs/versions/2026-11-03_v0.2_project-documentation.pdf) |
 | v0.1 | 2026-11-03 | [docs/versions/2026-11-03_v0.1_project-documentation.pdf](docs/versions/2026-11-03_v0.1_project-documentation.pdf) |
 
 The doc holds the requirements, the decision log (ADRs), the architecture, risks, open questions, the build plan, setup guides and a glossary. What changed between versions is listed in [CHANGELOG.md](CHANGELOG.md).
+
+Details of the home network (addresses, router, device list) are intentionally not part of this repository.
 
 Later, the documentation moves into Markdown files in this repository (see ADR-009).
 
