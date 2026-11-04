@@ -1,11 +1,11 @@
 # ADR-007: The network stays on the router's /24 subnet
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-03
 
 ## Context
 
-Without router access the router keeps its /24 subnet, so addresses outside it would lose internet access.
+Without router access the router keeps its /24 subnet, so addresses outside it would lose internet access. Samuel accepted this on 4 Nov 2026.
 
 ## Decision
 

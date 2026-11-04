@@ -8,9 +8,9 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-002](002-home-assistant-owns-alarms.md) | Home Assistant owns the alarms; Sonos only plays the sound | Accepted |
 | [ADR-003](003-cloud-services-for-external-access.md) | Cloud services by default for external access | Accepted |
 | [ADR-004](004-alarm-schedule-and-stopping.md) | Several alarms on custom weekday groups, no snooze; stop with the Sonos button, the phone or a timeout | Accepted |
-| [ADR-005](005-crunchyroll-history-add-on.md) | A small add-on on the Pi fetches Crunchyroll history every hour | Accepted |
+| [ADR-005](005-crunchyroll-history-add-on.md) | A small add-on on the Pi fetches Crunchyroll history every hour | Rejected |
 | [ADR-006](006-fully-kiosk-on-the-tv.md) | The TV shows dashboards through Fully Kiosk | Accepted |
-| [ADR-007](007-network-stays-on-routers-subnet.md) | The network stays on the router's /24 subnet | Proposed |
+| [ADR-007](007-network-stays-on-routers-subnet.md) | The network stays on the router's /24 subnet | Accepted |
 | [ADR-008](008-remote-access-through-tailscale.md) | Remote access through Tailscale instead of Home Assistant Cloud | Accepted |
 | [ADR-009](009-documentation-as-pdf-then-markdown.md) | Documentation is a working copy on claude.ai, exported as PDF, later Markdown in the repository | Accepted |
 | [ADR-010](010-calendars-merged-into-one-view.md) | All picked calendars merge into one calendar view | Accepted |
@@ -26,3 +26,4 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-020](020-sonos-backup-alarm.md) | One Sonos alarm is used as the backup alarm | Accepted |
 | [ADR-021](021-watchdog.md) | A watchdog notifies the phone when the Pi stops checking in | Accepted |
 | [ADR-022](022-tv-loads-pages-from-the-pi.md) | The TV loads its pages from the Raspberry Pi in the long term | Accepted |
+| [ADR-023](023-no-watch-overview.md) | The watch overview is left out | Accepted |
