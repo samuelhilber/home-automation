@@ -11,13 +11,12 @@ Goal 1 for the 1.0 release:
 - A new landing page and a morning screen on the TV.
 - Alarms owned by Home Assistant: play Spotify on a Sonos zone, wake the TV, show weather and the schedule.
 - Control from the iPhone, also from outside the home.
-- One overview of last-watched shows and anime with a new-episode flag.
 
 Single user (Samuel). Low running cost matters.
 
 ## Where things are decided
 
-- The **project documentation** (requirements R1–R19, decision log ADR-001 to ADR-022, risks, open questions, build plan) is a living doc on claude.ai. It is the single source of truth. Each version is exported as a PDF to `docs/versions/`; read the newest one before changing anything that touches a decision.
+- The **project documentation** (requirements R1–R19, decision log ADR-001 to ADR-023, risks, open questions, build plan) is a living doc on claude.ai. It is the single source of truth. Each version is exported as a PDF to `docs/versions/`; read the newest one before changing anything that touches a decision.
 - Decisions are also mirrored as Markdown in `docs/adr/`, one file per ADR.
 - `CHANGELOG.md` summarises what changed between documentation versions.
 - If something here contradicts the newest PDF, the PDF wins. Point out the conflict instead of guessing.
@@ -49,7 +48,7 @@ If a task seems to need any of this, ask Samuel to provide it locally (e.g. in `
 - **Updates:** never automatic. A pop-up in the management web app announces them; Samuel confirms each one. Nothing installs from 21:00 until 2 hours after the last alarm (10:00 on days without one) (ADR-018, ADR-019).
 - **Remote access:** Tailscale only (ADR-008). Home Assistant is never exposed to the public internet; no port forwarding (there is no router access anyway).
 - **Network:** stay in the router's existing /24 subnet (ADR-007). Do not propose a different subnet mask.
-- **Watch overview:** hourly Crunchyroll history add-on using the unofficial API, accepted for private use (ADR-005). The other services (Trakt VIP vs. own fetchers) are still open.
+- **No watch overview:** there is no tracker for shows or anime in 1.0: no Trakt, no fetchers, no Crunchyroll add-on, no series panel on the TV (ADR-023, replaces ADR-005). Do not propose one.
 
 ## Repository layout
 

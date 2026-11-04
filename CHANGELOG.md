@@ -7,6 +7,8 @@ All notable changes to the project documentation. Newest version first.
 Repository catch-up for decisions already made in the living doc; folds into the v0.3 entry once that PDF is exported.
 
 - ADR-022 (TV loads its pages from the Pi, not from files bundled on the TV) added, mirrored in `docs/adr/`.
+- ADR-023 (watch overview left out: Trakt terms of service, VPPA consent) added; it supersedes ADR-005 (Crunchyroll add-on). The open Trakt question is closed, and the series panel is removed from the TV prototype.
+- ADR-007 (/24 subnet) accepted.
 - Decision log ADR-001 to ADR-022 now also kept as Markdown in `docs/adr/` (one file per ADR), alongside the PDF.
 - `homeassistant/` configuration skeleton added under version control.
 - UI prototypes for the TV and admin/phone view built and signed off by Samuel (`prototypes/`).

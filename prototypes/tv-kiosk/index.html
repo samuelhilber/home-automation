@@ -56,10 +56,11 @@
     transform-origin:center center; transform:scale(var(--s,1)) translate(var(--dx,0px), var(--dy,0px));
     display:grid; gap:20px;
     grid-template-columns:2fr 3fr 1fr;
-    grid-template-rows:44fr 56fr;
+    grid-template-rows:44fr 25fr 31fr;
     grid-template-areas:
       "weather calendar calendar"
-      "series  today    side";
+      "clock   today    today"
+      "player  today    today";
   }
   .tabular{font-variant-numeric:tabular-nums}
 
@@ -113,27 +114,10 @@
   .legend i{width:10px; height:10px; background:var(--accent-fill)}
   .legend i.grey{background:var(--grey-fill)}
 
-  /* ---- series ---- */
-  .p-series{grid-area:series}
-  .p-series .head .pill{margin-left:4px}
-  .comment{font-size:14px; color:var(--faint); margin:12px 0 16px}
-  .shows{display:flex; flex-direction:column; gap:10px}
-  .show{display:grid; grid-template-columns:48px 1fr; gap:18px; align-items:center; padding:10px 18px 10px 14px; background:var(--panel-inner); border-left:3px solid var(--faint)}
-  .show.on{border-left-color:var(--accent-fill)}
-  .show .box{width:48px; height:48px; display:flex; align-items:center; justify-content:center; font-size:21px; border:2px solid var(--line); color:var(--faint)}
-  .show.on .box{background:var(--accent-fill); border-color:var(--accent-fill); color:var(--accent-ink)}
-  .show.paused .box{background:var(--grey-fill); border-color:var(--grey-fill); color:var(--accent-ink)}
-  .show .title{font-size:21px; font-weight:700}
-  .show .sub{display:flex; align-items:center; gap:12px; font-size:14px; color:var(--faint); margin:3px 0 8px; letter-spacing:.04em}
   .tag{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px}
-  .tag.on{background:var(--accent-fill); color:var(--accent-ink)}
-  .tag.grey{background:var(--grey-fill); color:var(--accent-ink)}
-  .tag.ghost{border:1px solid var(--faint); color:var(--muted)}
   .track{height:6px; background:rgba(160,190,168,.18)}
   .track span{display:block; height:100%; background:var(--accent-fill)}
   .track span.grey{background:var(--grey-fill)}
-  .embed{margin-top:14px; padding:11px 16px; border:1px solid var(--line-live); font-size:14px; color:var(--muted); display:flex; align-items:center; gap:12px}
-  .embed::before{content:""; width:4px; height:16px; background:var(--accent)}
 
   /* ---- today ---- */
   .p-today{grid-area:today}
@@ -144,9 +128,8 @@
   .hour.now time{color:var(--accent); font-weight:700}
   .hour.now::before{content:""; position:absolute; left:-26px; top:20%; bottom:20%; width:4px; background:var(--accent)}
 
-  /* ---- side column ---- */
-  .side{grid-area:side; display:flex; flex-direction:column; gap:20px; min-height:0}
-  .clock{flex:.9; padding:20px 22px; align-items:center; justify-content:center; text-align:center}
+  /* ---- clock & player, stacked under weather ---- */
+  .clock{grid-area:clock; padding:20px 22px; align-items:center; justify-content:center; text-align:center}
   .clock .head{align-self:flex-start}
   .clock .time{font-size:88px; font-weight:800; color:var(--accent); line-height:1; margin-top:8px; letter-spacing:-.01em}
   .clock .date{font-size:20px; color:var(--muted); margin-top:10px}
@@ -155,7 +138,7 @@
   .ticks i.on{background:var(--accent-fill)}
   .clock .foot{font-size:13px; color:var(--faint); margin-top:10px; letter-spacing:.04em}
 
-  .player{flex:1.1; padding:20px 22px; gap:14px}
+  .player{grid-area:player; padding:20px 22px; gap:14px}
   .np{display:flex; gap:16px; align-items:center}
   .art{width:84px; height:84px; flex:none; border:2px solid var(--accent-fill); display:flex; align-items:center; justify-content:center; background:var(--panel-inner)}
   .art i{width:62px; height:62px; border-radius:50%; background:radial-gradient(circle, var(--accent-fill) 0 13%, var(--panel-inner) 14% 32%, var(--accent-fill) 33% 100%)}
@@ -230,39 +213,8 @@
         <div class="day">MO<b>09</b><span class="mk"></span></div>
       </div>
       <hr class="rule">
-      <div class="events tabular">
-        <div class="event"><span><span data-evday>DI 03</span> &middot; 08:00</span><div class="bar">Stand-up Meeting</div></div>
-        <div class="event"><span><span data-evday>DI 03</span> &middot; 10:00</span><div class="bar grey">Projektreview</div></div>
-        <div class="event"><span><span data-evday>DI 03</span> &middot; 14:00</span><div class="bar">Design Sync</div></div>
-      </div>
-      <hr class="rule">
       <div class="legend"><span><i></i>Termin (Demo)</span><span><i class="grey"></i>Wichtig</span></div>
       <img class="egg" src="assets/egg-ichigo.png" alt="">
-    </section>
-
-    <section class="panel live p-series">
-      <div class="head">Serien-Tracker <span class="pill">Einbettung</span></div>
-      <div class="comment">// Eigene Web-App &ndash; vorgesehener Einbettungsbereich</div>
-      <div class="shows">
-        <div class="show on">
-          <div class="box">&#9654;</div>
-          <div><div class="title">Stranger Things</div><div class="sub tabular">S04 E08 <span class="tag on">Am schauen</span></div><div class="track"><span style="width:28%"></span></div></div>
-        </div>
-        <div class="show paused">
-          <div class="box">&#9632;</div>
-          <div><div class="title">The Bear</div><div class="sub tabular">S03 E05 <span class="tag grey">Pausiert</span></div><div class="track"><span class="grey" style="width:14%"></span></div></div>
-        </div>
-        <div class="show on">
-          <div class="box">&#10003;</div>
-          <div><div class="title">Severance</div><div class="sub tabular">S02 fertig <span class="tag on">Abgeschlossen</span></div><div class="track"><span style="width:45%"></span></div></div>
-        </div>
-        <div class="show">
-          <div class="box">&#9675;</div>
-          <div><div class="title">Fallout</div><div class="sub tabular">S01 ausstehend <span class="tag ghost">Warteliste</span></div><div class="track"><span style="width:0"></span></div></div>
-        </div>
-      </div>
-      <div class="embed">Web-App-URL hier einbinden &middot; Demo-Daten sichtbar</div>
-      <img class="egg" src="assets/egg-asta.png" alt="">
     </section>
 
     <section class="panel p-today">
@@ -282,30 +234,28 @@
       <img class="egg" src="assets/egg-ichigo.png" alt="">
     </section>
 
-    <div class="side">
-      <section class="panel clock">
-        <div class="head">Uhrzeit</div>
-        <div class="time tabular" id="time">20:47</div>
-        <div class="date tabular" id="date">Di, 03.11.2026</div>
-        <div class="ticks" id="ticks"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
-        <div class="foot tabular" id="week">KW 45 &middot; 307. Tag im Jahr</div>
-      </section>
+    <section class="panel clock">
+      <div class="head">Uhrzeit</div>
+      <div class="time tabular" id="time">20:47</div>
+      <div class="date tabular" id="date">Di, 03.11.2026</div>
+      <div class="ticks" id="ticks"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      <div class="foot tabular" id="week">KW 45 &middot; 307. Tag im Jahr</div>
+    </section>
 
-      <section class="panel live player">
-        <div class="head">Spotify <span class="pill">L&auml;uft</span></div>
-        <div class="np">
-          <div class="art"><i></i></div>
-          <div class="t">
-            <div class="song">Blinding Lights</div>
-            <div class="artist">The Weeknd</div>
-            <div class="list">&#9654; Lo-Fi Chill Vibes Mix</div>
-          </div>
+    <section class="panel live player">
+      <div class="head">Spotify <span class="pill">L&auml;uft</span></div>
+      <div class="np">
+        <div class="art"><i></i></div>
+        <div class="t">
+          <div class="song">Blinding Lights</div>
+          <div class="artist">The Weeknd</div>
+          <div class="list">&#9654; Lo-Fi Chill Vibes Mix</div>
         </div>
-        <div class="prog tabular"><span>2:14</span><div class="track"><span style="width:66%"></span></div><span>3:22</span></div>
-        <div class="ctl"><span>&#9664;&#9664;</span><span class="main">&#10074;&#10074;</span><span>&#9654;&#9654;</span></div>
-        <div class="foot">// Demo &ndash; keine Echtzeit-Daten</div>
-      </section>
-    </div>
+      </div>
+      <div class="prog tabular"><span>2:14</span><div class="track"><span style="width:66%"></span></div><span>3:22</span></div>
+      <div class="ctl"><span>&#9664;&#9664;</span><span class="main">&#10074;&#10074;</span><span>&#9654;&#9654;</span></div>
+      <div class="foot">// Demo &ndash; keine Echtzeit-Daten</div>
+    </section>
 
   </main>
 </div>

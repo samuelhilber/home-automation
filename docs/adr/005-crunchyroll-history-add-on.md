@@ -1,11 +1,11 @@
 # ADR-005: A small add-on on the Pi fetches Crunchyroll history every hour
 
-- Status: Accepted
+- Status: Rejected (replaced by [ADR-023](023-no-watch-overview.md))
 - Date: 2026-11-03
 
 ## Context
 
-Crunchyroll has no public history API. The account history also covers the TV. Samuel accepted the terms-of-service risk for this private use on 3 Nov 2026.
+Crunchyroll has no public history API. The account history also covers the TV. Samuel accepted the terms-of-service risk for this private use on 3 Nov 2026. On 4 Nov 2026 he dropped the whole watch overview, so this add-on will not be built.
 
 ## Decision
 

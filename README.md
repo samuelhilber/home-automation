@@ -7,7 +7,6 @@ Goal 1 for the 1.0 release:
 - A new landing page on the TV.
 - Alarms managed in Home Assistant: the alarm plays on Sonos, switches the TV on and shows the weather and the schedule (Apple Calendar + Outlook).
 - Control from the iPhone, also from outside the home (Tailscale).
-- One overview of the last-watched shows and anime, with a flag when a new episode is available.
 
 ## Documentation
 

@@ -4,7 +4,7 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 
 ## Done
 
-- Planning: requirements R1–R19, decisions ADR-001 to ADR-022 (newest PDF in `docs/versions/`; ADR-022 also mirrored in `docs/adr/`).
+- Planning: requirements R1–R19, decisions ADR-001 to ADR-023 (newest PDF in `docs/versions/`; ADR-022 and ADR-023 also mirrored in `docs/adr/`).
 - Hardware bought: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case; on order, not arrived. Storage: SanDisk Extreme Portable SSD 1 TB, already emptied (Home Assistant OS will wipe it anyway).
 - Sony TV: storage freed up.
 - Sonos: UPnP is on. The backup alarm exists in the Sonos app at **04:44**, switched **off**. Once Home Assistant runs, find it by that time, label it "Backup" and take it over (ADR-020).
@@ -22,7 +22,6 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 
 ## Open (later)
 
-- Watch overview for Netflix, Disney+, Prime Video, Apple TV+ and HBO Max: Trakt VIP or self-built fetchers. Research before build step 7.
 - Choose the watchdog service (ADR-021) during the build.
 
 ## Next build steps
@@ -30,7 +29,7 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 1. Install Home Assistant OS on the SSD (Raspberry Pi Imager on Samuel's Windows PC), boot the Pi.
 2. Put the configuration under Git in `homeassistant/`, set up Tailscale, nightly backups.
 3. TV test: Bravia integration with pre-shared key, "Remote start", Fully Kiosk (free version first).
-4. Data sources, alarms, phone UI, watch overview, as in the build plan.
+4. Data sources, alarms, phone UI, as in the build plan (no watch overview, see ADR-023).
 
 ## Backend (management web app): what the mockup must contain
 
@@ -42,4 +41,4 @@ Runs on phone and computer. Single user, reached at home and through Tailscale. 
 4. **Updates:** pop-up with name, old and new version, release-notes link, "Install" and "Later". Two variants: during the day "Install" installs right away; at night (21:00 until 2 hours after the last alarm) it says "Will be installed on [date] at [time]". Queue of scheduled updates, and a history with results (success or failure). A daily phone notification at 21:00 announces waiting updates; results of queued updates go to the phone.
 5. **System:** backup alarm (time and zone, read-only); watchdog (last check-in); last nightly backup (time and result).
 
-Not decided yet, leave open in the mockup: settings for the watch overview, custom names for alarms.
+Not decided yet, leave open in the mockup: custom names for alarms.
