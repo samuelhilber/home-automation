@@ -1,6 +1,6 @@
 # ADR-001: Home Assistant OS on a Raspberry Pi is the platform
 
-- Status: Accepted
+- Status: Superseded by ADR-024
 - Date: 2026-11-03
 
 ## Context

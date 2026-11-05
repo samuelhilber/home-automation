@@ -4,7 +4,7 @@ One file per decision. The project documentation is the source of truth; if a fi
 
 | ID | Decision | Status |
 | --- | --- | --- |
-| [ADR-001](001-home-assistant-on-raspberry-pi.md) | Home Assistant OS on a Raspberry Pi is the platform | Accepted |
+| [ADR-001](001-home-assistant-on-raspberry-pi.md) | Home Assistant OS on a Raspberry Pi is the platform | Superseded by ADR-024 |
 | [ADR-002](002-home-assistant-owns-alarms.md) | Home Assistant owns the alarms; Sonos only plays the sound | Accepted |
 | [ADR-003](003-cloud-services-for-external-access.md) | Cloud services by default for external access | Accepted |
 | [ADR-004](004-alarm-schedule-and-stopping.md) | Several alarms on custom weekday groups, no snooze; stop with the Sonos button, the phone or a timeout | Accepted |
@@ -27,3 +27,4 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-021](021-watchdog.md) | A watchdog notifies the phone when the Pi stops checking in | Accepted |
 | [ADR-022](022-tv-loads-pages-from-the-pi.md) | The TV loads its pages from the Raspberry Pi in the long term | Accepted |
 | [ADR-023](023-no-watch-overview.md) | The watch overview is left out | Accepted |
+| [ADR-024](024-raspberry-pi-os-and-docker.md) | Raspberry Pi OS with Home Assistant in Docker replaces Home Assistant OS | Accepted |

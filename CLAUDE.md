@@ -4,7 +4,7 @@ Guidance for Claude Code in this repository. Keep it short and current: when a d
 
 ## Project
 
-Home Automation 1.0 is Samuel's personal home-automation setup. Home Assistant OS on a Raspberry Pi 5 is the hub; it drives a Sony A95K (Google TV), four Sonos speakers (Arc, Sub, two One SL) and talks to an iPhone.
+Home Automation 1.0 is Samuel's personal home-automation setup. Home Assistant, in Docker on a Raspberry Pi 5 running Raspberry Pi OS, is the hub; it drives a Sony A95K (Google TV), four Sonos speakers (Arc, Sub, two One SL) and talks to an iPhone.
 
 Goal 1 for the 1.0 release:
 
@@ -39,7 +39,7 @@ If a task seems to need any of this, ask Samuel to provide it locally (e.g. in `
 
 ## Key decisions to respect
 
-- **Platform:** Home Assistant OS on a Raspberry Pi 5 8 GB, booting from an SSD, passive case in the bedroom (ADR-001, ADR-017).
+- **Platform:** Raspberry Pi OS on a Raspberry Pi 5 8 GB, booting from an SSD, passive case in the bedroom; Home Assistant runs in Docker (the Container image), not Home Assistant OS, so there is no Supervisor or add-on store — check HACS before custom code instead (ADR-001 superseded, ADR-017, ADR-024).
 - **Alarms:** Home Assistant owns them; Sonos only plays sound (ADR-002). Several alarms on single weekdays or custom weekday groups, no snooze; stop via Sonos button (pause detection), phone, or after 15 minutes (ADR-004). Skip St. Gallen public holidays via the Workday integration (ADR-012).
 - **Music:** Home Assistant starts the Spotify playlist directly and plays it on the chosen Sonos zone; fixed volume (ADR-014). Starting a Sonos favourite (ADR-013) was rejected.
 - **Alarm safety net:** one Sonos alarm stored on the speaker as backup, synced nightly to 10 minutes after the next alarm, switched off by Home Assistant only after the real alarm was stopped (ADR-020). Sonos alarms have no names: Home Assistant finds the backup by its internal alarm ID and labels it "Backup", so never match it by name or create a second one. A watchdog with an outside dead-man's-switch service (ADR-021). Never weaken these.
