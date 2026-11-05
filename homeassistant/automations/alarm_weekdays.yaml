@@ -1,0 +1,14 @@
+- id: alarm_weekdays_0630
+  alias: Alarm Mon-Fri 06:30
+  description: Rings the alarm chain on weekdays.
+  mode: single
+  triggers:
+    - trigger: time
+      at: "06:30:00"
+  conditions:
+    # Public holidays are not skipped yet: the Workday integration (ADR-012)
+    # still has to be set up, and a missing sensor would silence the alarm.
+    - condition: time
+      weekday: [mon, tue, wed, thu, fri]
+  actions:
+    - action: script.alarm_ring
