@@ -9,6 +9,11 @@ services:
     restart: unless-stopped
     env_file: ${API_ENV_FILE:-api.env}
     environment:
+      # Set here, not in the env file: values in the file (the example has HOST=127.0.0.1) would
+      # otherwise win over the image and make the container unreachable.
+      HOST: 0.0.0.0
+      PORT: "8787"
+      WEB_ROOT: /srv/web
       CALENDARS_FILE: /data/calendars/calendars.json
       CALENDAR_STATE_FILE: /data/state/calendar-state.json
     ports:
