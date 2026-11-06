@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import Icon from './Icon'
 import { statusApi } from '../lib/api'
 import { usePolling } from '../hooks/usePolling'
@@ -52,7 +53,7 @@ export default function WeatherPanel() {
           </div>
         ))}
       </div>
-      <img className="egg" src="/assets/egg-asta.png" alt="" />
+      <img className="egg" src={asset('egg-asta.png')} alt="" />
     </section>
   )
 }

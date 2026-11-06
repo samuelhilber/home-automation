@@ -1,3 +1,4 @@
+import { asset } from '../lib/asset'
 import { hours } from '../mockData'
 import { DAYS_TC, dm, pad, utcDate, type ZurichNow } from '../lib/time'
 import './TodayPanel.css'
@@ -22,7 +23,7 @@ export default function TodayPanel({ now }: { now: ZurichNow }) {
           </div>
         ))}
       </div>
-      <img className="egg" src="/assets/egg-ichigo.png" alt="" />
+      <img className="egg" src={asset('egg-ichigo.png')} alt="" />
     </section>
   )
 }
