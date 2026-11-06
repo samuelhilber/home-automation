@@ -1,6 +1,6 @@
 # The alarm sound chain (ADR-002, ADR-004, ADR-014). Started by the alarm
 # automations; the Sonos backup alarm on the speaker stays the safety net.
-# The TV is left out on purpose; all TV commands go through one TV script later.
+# The TV is woken through script.tv_command, the single entry point for TV commands.
 alarm_ring:
   alias: Alarm ring
   mode: single
@@ -20,6 +20,14 @@ alarm_ring:
       data:
         media_content_type: playlist
         media_content_id: "{{ playlist }}"
+    # script.turn_on starts the TV script without waiting for it, so a slow or
+    # broken TV can neither delay nor stop the alarm sound.
+    - action: script.turn_on
+      target:
+        entity_id: script.tv_command
+      data:
+        variables:
+          command: wake
     # Sonos can report "paused" while the stream starts, which would end the
     # alarm at once; wait until playback has settled before watching for it.
     - delay: "00:00:20"
