@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalender-Import und Updates – Skizze</title>
+<style>
+  :root{--bg:#0a110c;--surface:#121d15;--surface-2:#0e1711;--border:#223328;--border-strong:#2f4a38;--accent:#7cf29b;--accent-dim:#3d6b4a;--accent-soft:rgba(124,242,155,.12);--accent-ink:#06150c;--text:#e8f1e6;--muted:#95aa9b;--faint:#5d7064;--r:6px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 'JetBrains Mono',ui-monospace,Consolas,monospace;padding:24px 16px}
+  h1{font-size:18px;margin:0 0 4px} h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 12px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;max-width:1000px}
+  @media(min-width:900px){.grid{grid-template-columns:1fr 1.5fr}.wide{grid-column:1/-1}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+  .src{margin-bottom:16px}.src b{display:block;font-size:12.5px;margin-bottom:6px}
+  .line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--border);font-size:12.5px}
+  .sw{width:38px;height:22px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border-strong);position:relative;flex:none}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--faint)}
+  .sw.on{background:var(--accent-dim);border-color:var(--accent)}.sw.on::after{left:19px;background:var(--accent)}
+  .day{color:var(--accent);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;margin:14px 0 4px}
+  .ev{display:flex;gap:12px;align-items:center;padding:9px 0;border-top:1px solid var(--border)}
+  .ev .t{font-variant-numeric:tabular-nums;color:var(--muted);min-width:90px;font-size:12px}
+  .ev .n{flex:1}.ev small{display:block;color:var(--faint);font-size:11px}
+  .ser{color:var(--accent);font-size:11px;border:1px solid var(--accent-dim);border-radius:3px;padding:0 5px;margin-left:6px}
+  .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r);padding:6px 12px;font:inherit;font-weight:700;font-size:12.5px}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border-strong)}
+  .modal{border-color:var(--accent);max-width:520px}
+  .ver{display:flex;gap:8px;align-items:center;margin:10px 0;font-size:13px}.ver s{color:var(--faint)}
+  .hint{color:var(--muted);font-size:12px;margin:10px 0}
+  .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+  .q{margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12.5px}
+  .q .line{border:0;padding:3px 0}
+  .ok{color:var(--accent)}.bad{color:#ff8a8a}
+  .note{color:var(--faint);font-size:12px;margin:20px 0 0;max-width:1000px}
+</style>
+</head>
+<body>
+<h1>Kalender-Import und Updates – Skizze</h1>
+<p class="sub">Skizze zur Abnahme. Oben die Seite „Kalender-Import“, unten das Updates-Fenster (öffnet sich über das Abzeichen „2 Updates warten“).</p>
+
+<div class="grid">
+  <section class="card">
+    <h2>Quellen</h2>
+    <div class="src"><b>iCloud</b>
+      <div class="line">Privat <span class="sw on"></span></div>
+      <div class="line">Familie <span class="sw on"></span></div>
+    </div>
+    <div class="src"><b>Outlook Arbeit</b>
+      <div class="line">Kalender <span class="sw on"></span></div>
+      <div class="line">Besprechungen <span class="sw"></span></div>
+    </div>
+    <div class="src"><b>Outlook Schule</b>
+      <div class="line">Stundenplan <span class="sw on"></span></div>
+      <div class="line" style="color:var(--faint)">Noch nicht angemeldet · <span class="btn ghost" style="padding:2px 8px">Anmelden</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Termine · Vorschau auf dem Morgenbildschirm</h2>
+    <div class="day">Heute</div>
+    <div class="ev"><span class="t">09:00–09:30</span><span class="n">Team-Standup<small>Outlook Arbeit</small></span><span class="sw on"></span></div>
+    <div class="ev"><span class="t">12:30–13:30</span><span class="n">Mittagessen mit Anna<small>iCloud · Privat</small></span><span class="sw on"></span></div>
+    <div class="day">Morgen</div>
+    <div class="ev"><span class="t">08:15–09:00</span><span class="n">Mathe <span class="ser">↻ Serie</span><small>Outlook Schule</small></span><span class="sw on"></span></div>
+    <div class="ev"><span class="t">14:00–15:00</span><span class="n">Zahnarzt<small>iCloud · Privat</small></span><span class="sw"></span></div>
+    <div class="hint">Neue Termine sind standardmässig an. Bei einer Serie gilt der Schalter für die ganze Serie.</div>
+  </section>
+
+  <section class="card modal wide">
+    <h2>Updates (Fenster)</h2>
+    <b>Home Assistant Core</b>
+    <div class="ver"><s>2026.10.3</s> → <span class="ok">2026.11.0</span> · <a style="color:var(--accent)">Versionshinweise ↗</a></div>
+    <div class="hint">Tagsüber: „Installieren“ startet sofort.<br>Nachts (ab 21:00 bis 2 Std. nach dem letzten Wecker) steht dort: „Wird am 07.11. um 10:00 installiert“.</div>
+    <div class="acts"><button class="btn ghost">Später</button><button class="btn">Installieren</button></div>
+    <div class="q"><b>Geplant</b>
+      <div class="line">HACS Sonos-Helfer 1.4.2 → 1.5.0 <span>07.11., 10:00</span></div>
+      <b style="display:block;margin-top:10px">Verlauf</b>
+      <div class="line">Home Assistant 2026.10.2 → 2026.10.3 <span class="ok">Erfolgreich · 02.11.</span></div>
+      <div class="line">Watchdog-Skript 1.1 → 1.2 <span class="bad">Fehlgeschlagen · 28.10.</span></div>
+    </div>
+  </section>
+</div>
+<p class="note">Alle Namen, Zeiten und Versionen sind erfundene Beispiele, keine echten Kalenderdaten.</p>
+</body>
+</html>

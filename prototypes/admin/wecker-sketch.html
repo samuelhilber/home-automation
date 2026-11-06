@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wecker – Skizze</title>
+<style>
+  :root{--bg:#0a110c;--surface:#121d15;--surface-2:#0e1711;--border:#223328;--border-strong:#2f4a38;--accent:#7cf29b;--accent-soft:rgba(124,242,155,.12);--accent-ink:#06150c;--text:#e8f1e6;--muted:#95aa9b;--faint:#5d7064;--r:6px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 'JetBrains Mono',ui-monospace,Consolas,monospace;padding:24px 16px}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .note{color:var(--faint);font-size:12px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.08em}
+  .grid{display:grid;grid-template-columns:1fr;gap:24px;max-width:1100px}
+  @media(min-width:900px){.grid{grid-template-columns:1.1fr 1fr}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+  .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .head b{font-size:15px}
+  .btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r);padding:6px 12px;font:inherit;font-weight:700}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border-strong)}
+  .row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface-2);margin-bottom:8px}
+  .row.sel{border-color:var(--accent)}
+  .row.off{opacity:.55}
+  .time{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;min-width:68px}
+  .mid{flex:1;min-width:0}
+  .days{display:flex;gap:4px;margin-bottom:2px}
+  .d{width:22px;height:22px;display:grid;place-items:center;font-size:11px;border-radius:4px;color:var(--faint);border:1px solid var(--border)}
+  .d.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-dim,#3d6b4a)}
+  .meta{color:var(--muted);font-size:12px}
+  .switch{width:38px;height:22px;border-radius:11px;background:var(--border);border:0;position:relative;flex:none}
+  .switch i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--muted)}
+  .switch.on{background:var(--accent)}
+  .switch.on i{left:19px;background:var(--accent-ink)}
+  .hint{color:var(--muted);font-size:12px;margin-top:12px}
+  label{display:block;color:var(--muted);font-size:12px;margin:14px 0 4px}
+  .field{background:var(--surface-2);border:1px solid var(--border-strong);border-radius:var(--r);padding:8px 10px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{padding:4px 10px;border:1px solid var(--border-strong);border-radius:999px;font-size:12px;color:var(--muted)}
+  .chip.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+  .line{display:flex;justify-content:space-between;align-items:center}
+  .actions{display:flex;gap:8px;justify-content:space-between;margin-top:18px}
+  .danger{color:#ff8a8a;border-color:#5a2b2b}
+</style>
+</head>
+<body>
+<h1>Wecker – Skizze</h1>
+<p class="sub">Grobe Skizze zur Abnahme. Links die Liste, rechts das Bearbeiten-Fenster (Alarm anklicken oder „+ Neuer Wecker“).</p>
+
+<div class="grid">
+  <section>
+    <p class="note">Liste</p>
+    <div class="card">
+      <div class="head"><b>Wecker</b><button class="btn">+ Neuer Wecker</button></div>
+
+      <div class="row sel">
+        <div class="time">06:30</div>
+        <div class="mid">
+          <div class="days"><span class="d on">Mo</span><span class="d on">Di</span><span class="d on">Mi</span><span class="d on">Do</span><span class="d on">Fr</span><span class="d">Sa</span><span class="d">So</span></div>
+          <div class="meta">Wohnzimmer-Gruppe · Discover Weekly · Lautstärke 5 · TV an</div>
+        </div>
+        <button class="switch on" aria-label="an"><i></i></button>
+      </div>
+
+      <div class="row off">
+        <div class="time">08:30</div>
+        <div class="mid">
+          <div class="days"><span class="d">Mo</span><span class="d">Di</span><span class="d">Mi</span><span class="d">Do</span><span class="d">Fr</span><span class="d on">Sa</span><span class="d on">So</span></div>
+          <div class="meta">Schlafzimmer · Discover Weekly · Lautstärke 5 · TV aus</div>
+        </div>
+        <button class="switch" aria-label="aus"><i></i></button>
+      </div>
+
+      <div class="hint">Der Backup-Wecker erscheint hier nicht, er wird unter „System“ nur angezeigt. Feiertage in St. Gallen werden übersprungen.</div>
+    </div>
+  </section>
+
+  <section>
+    <p class="note">Bearbeiten / Neu</p>
+    <div class="card">
+      <div class="head"><b>Wecker bearbeiten</b><button class="btn ghost">Schliessen</button></div>
+
+      <label>Uhrzeit</label>
+      <div class="field" style="font-size:22px;font-weight:700">06:30</div>
+
+      <label>Wochentage</label>
+      <div class="chips">
+        <span class="chip on">Mo</span><span class="chip on">Di</span><span class="chip on">Mi</span><span class="chip on">Do</span><span class="chip on">Fr</span><span class="chip">Sa</span><span class="chip">So</span>
+      </div>
+      <div class="chips" style="margin-top:6px">
+        <span class="chip">Werktage</span><span class="chip">Wochenende</span><span class="chip">Täglich</span>
+      </div>
+
+      <label>Sonos-Zone</label>
+      <div class="field">Wohnzimmer-Gruppe ▾</div>
+
+      <label>Spotify-Quelle</label>
+      <div class="field">Discover Weekly ▾</div>
+
+      <label>Lautstärke (fest)</label>
+      <div class="field line"><span>5</span><span style="color:var(--faint)">von 100</span></div>
+
+      <label>TV aufwecken</label>
+      <div class="line"><span class="meta">Morgenbildschirm beim Klingeln</span><button class="switch on" aria-label="an"><i></i></button></div>
+
+      <div class="hint">Kein Schlummern. Beim Klingeln: grosser „Stopp“-Knopf, der Wecker stoppt nach 15 Minuten von selbst.</div>
+
+      <div class="actions">
+        <button class="btn ghost danger">Löschen</button>
+        <div style="display:flex;gap:8px"><button class="btn ghost">Abbrechen</button><button class="btn">Speichern</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

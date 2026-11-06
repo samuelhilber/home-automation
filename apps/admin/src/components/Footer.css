@@ -1,0 +1,26 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px 32px 24px;
+  font-size: 11px;
+  color: var(--faint);
+}
+.footer .live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer .live i {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+}
+
+@media (max-width: 860px) {
+  .footer {
+    padding: 14px var(--gutter-r) 24px var(--gutter-l);
+  }
+}

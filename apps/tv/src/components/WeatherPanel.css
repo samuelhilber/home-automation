@@ -1,0 +1,83 @@
+.p-weather {
+  grid-area: weather;
+}
+.now {
+  display: flex;
+  gap: 26px;
+  align-items: center;
+  margin-top: 22px;
+}
+.now-icon {
+  width: 118px;
+  height: 118px;
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 70px;
+  color: var(--text);
+  flex: none;
+  background: var(--panel-inner);
+}
+.temp {
+  font-size: 92px;
+  font-weight: 800;
+  line-height: 0.95;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.cond {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 8px 0 14px;
+}
+.meta {
+  display: flex;
+  gap: 28px;
+}
+.meta div {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.meta b {
+  display: block;
+  font-size: 19px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  font-weight: 600;
+  margin-top: 3px;
+}
+.forecast {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+.forecast .d {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.forecast .icon {
+  font-size: 30px;
+  color: var(--text);
+}
+.forecast b {
+  font-size: 20px;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.forecast .lo {
+  font-size: 15px;
+  letter-spacing: 0;
+  margin-top: -4px;
+}

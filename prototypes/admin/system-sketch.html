@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System – Skizze</title>
+<style>
+  :root{--bg:#0a110c;--surface:#121d15;--surface-2:#0e1711;--border:#223328;--border-strong:#2f4a38;--accent:#7cf29b;--accent-dim:#3d6b4a;--accent-soft:rgba(124,242,155,.12);--text:#e8f1e6;--muted:#95aa9b;--faint:#5d7064;--r:6px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 'JetBrains Mono',ui-monospace,Consolas,monospace;padding:24px 16px}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:1fr;gap:16px;max-width:900px}
+  @media(min-width:800px){.grid{grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+  .label{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .status{font-size:11px;font-weight:600;padding:3px 9px;border:1px solid var(--accent-dim);background:var(--accent-soft);color:var(--accent);border-radius:3px;letter-spacing:0;text-transform:none}
+  .big{font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+  dl{margin:14px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:12.5px}
+  dt{color:var(--muted)} dd{margin:0;text-align:right}
+  .hint{color:var(--muted);font-size:12px;margin-top:14px}
+  .tag{display:inline-block;font-size:10.5px;color:var(--faint);border:1px solid var(--border);border-radius:3px;padding:0 6px;margin-left:8px;letter-spacing:0;text-transform:none;font-weight:400}
+  .err{color:#ff8a8a;border-color:#5a2b2b;background:rgba(255,138,138,.08)}
+  .meters{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(min-width:800px){.meters{grid-template-columns:repeat(4,1fr)}}
+  .m small{display:block;color:var(--muted);font-size:11.5px}
+  .m b{font-size:22px;font-variant-numeric:tabular-nums}
+  .m em{display:block;font-style:normal;color:var(--faint);font-size:11px}
+  .bar{height:6px;background:var(--surface-2);border:1px solid var(--border);border-radius:3px;margin:6px 0 4px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent)}
+  .note{color:var(--faint);font-size:12px;margin:24px 0 0;max-width:900px}
+</style>
+</head>
+<body>
+<h1>System – Skizze</h1>
+<p class="sub">Grobe Skizze zur Abnahme. Alles nur Anzeige, nichts bedienbar (Backup-Wecker schalten bleibt auf der Übersicht).</p>
+
+<div class="grid">
+  <section class="card">
+    <div class="label"><span>Backup-Wecker <span class="tag">nur lesen</span></span><span class="status">Eingeschaltet</span></div>
+    <div class="big">06:35</div>
+    <dl>
+      <dt>Zone</dt><dd>Wohnzimmer-Gruppe</dd>
+      <dt>Abstand</dt><dd>5 Min. nach Hauptwecker</dd>
+      <dt>Letzter Abgleich</dt><dd>gestern, 21:00</dd>
+    </dl>
+    <div class="hint">Wird jede Nacht an den nächsten Wecker angepasst.</div>
+  </section>
+
+  <section class="card">
+    <div class="label"><span>Watchdog</span><span class="status">OK</span></div>
+    <div class="big">20:46</div>
+    <dl>
+      <dt>Letzte Meldung</dt><dd>vor 12 Sek.</dd>
+      <dt>Externer Dienst</dt><dd>erreicht</dd>
+    </dl>
+    <div class="hint">Meldet sich regelmässig bei einem Dienst ausserhalb des Hauses. Bleibt die Meldung aus, kommt eine Warnung aufs Handy.</div>
+  </section>
+
+  <section class="card wide">
+    <div class="label"><span>Raspberry Pi <span class="tag">morgenpi</span></span><span class="status">Online</span></div>
+    <div class="meters">
+      <div class="m"><small>CPU-Auslastung</small><b>14 %</b><div class="bar"><i style="width:14%"></i></div></div>
+      <div class="m"><small>Temperatur</small><b>42 °C</b><div class="bar"><i style="width:35%"></i></div></div>
+      <div class="m"><small>Arbeitsspeicher</small><b>38 %</b><div class="bar"><i style="width:38%"></i></div><em>3,0 von 8 GB</em></div>
+      <div class="m"><small>SSD-Speicher</small><b>21 %</b><div class="bar"><i style="width:21%"></i></div><em>50 von 240 GB</em></div>
+    </div>
+    <dl>
+      <dt>Laufzeit</dt><dd>12 Tage, 08 Std.</dd>
+      <dt>Netzwerk</dt><dd>stabil</dd>
+      <dt>Home Assistant</dt><dd>läuft (Docker)</dd>
+    </dl>
+    <div class="hint">Bei Temperatur über 70 °C oder SSD über 90 % wird der Balken rot.</div>
+  </section>
+
+  <section class="card wide">
+    <div class="label"><span>Letztes nächtliches Backup</span><span class="status">Erfolgreich</span></div>
+    <div class="big">03:00</div>
+    <dl>
+      <dt>Zeitpunkt</dt><dd>heute, 03:00</dd>
+      <dt>Ergebnis</dt><dd>Erfolgreich</dd>
+    </dl>
+    <div class="hint">Bei einem Fehler wird die Karte rot und zeigt den Grund.</div>
+  </section>
+</div>
+
+<p class="note">Die Werte sind erfundene Beispiele. Die Pi-Karte zeigt mehr Details als die Kurzfassung auf der Übersicht.</p>
+</body>
+</html>

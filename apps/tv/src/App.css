@@ -1,0 +1,27 @@
+/* Fixed 1920x1080 kiosk stage, scaled to the screen (2x on the 4K TV); see-through panels over the pixel forest. */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stage {
+  width: 1920px;
+  height: 1080px;
+  flex: none;
+  padding: 28px;
+  transform-origin: center center;
+  transform: scale(var(--s, 1)) translate(var(--dx, 0px), var(--dy, 0px));
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 2fr 3fr 1fr;
+  grid-template-rows: 44fr 25fr 31fr;
+  grid-template-areas:
+    'weather calendar calendar'
+    'clock   today    today'
+    'player  today    today';
+}

@@ -1,0 +1,208 @@
+.sidebar {
+  width: 232px;
+  flex: none;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px 12px 16px max(12px, env(safe-area-inset-left, 0px));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 8px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.brand .mark {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--accent);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-size: 17px;
+}
+.brand b {
+  display: block;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.brand small {
+  display: block;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+
+.nav-label {
+  font-size: 10px;
+  letter-spacing: 0.13em;
+  color: var(--faint);
+  text-transform: uppercase;
+  padding: 18px 10px 8px;
+}
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 0 5px 5px 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.nav button .icon {
+  font-size: 17px;
+}
+.nav button:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+.nav button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.nav button[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+  border-left-color: var(--accent);
+}
+
+.device {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+}
+.device .forest {
+  height: 96px;
+  position: relative;
+}
+.device .forest span {
+  position: absolute;
+  left: 10px;
+  bottom: 8px;
+  font-size: 10px;
+  color: #cfe3d4;
+  line-height: 1.4;
+}
+.device .forest .egg {
+  right: 10px;
+  bottom: 8px;
+}
+.device-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+.device-row .icon {
+  font-size: 16px;
+  color: var(--accent);
+}
+.device-row b {
+  display: block;
+  font-size: 12px;
+}
+.device-row small {
+  color: var(--faint);
+  font-size: 10px;
+}
+
+.online {
+  margin-left: auto;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  animation: blink 2.6s ease-in-out infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.forest {
+  background: #0a150e url('/assets/bg-forest.jpg') center 30% / cover no-repeat;
+}
+.egg {
+  position: absolute;
+  right: 16px;
+  bottom: 12px;
+  width: 32px;
+  height: 40px;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+@media (max-width: 860px) {
+  .sidebar {
+    display: contents;
+  }
+  .side-nav {
+    background: var(--sidebar);
+    padding: 18px var(--gutter-r) 6px var(--gutter-l);
+  }
+  .brand {
+    border-bottom: 0;
+    padding: 0;
+  }
+  .nav-label {
+    padding: 22px 3px 8px;
+  }
+  .nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 0 -12px;
+  }
+  .nav button {
+    min-height: 46px;
+    padding: 0 14px;
+    font-size: 12.5px;
+  }
+  .nav button:last-child {
+    grid-column: 1 / -1;
+  }
+  .nav .desktop-only {
+    display: none;
+  }
+  .device {
+    order: 2;
+    border: 0;
+    border-radius: 0;
+    background: var(--sidebar);
+    padding: 24px var(--gutter-r) max(24px, env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+  }
+  .device .forest {
+    height: 116px;
+    border-radius: 4px;
+  }
+  .device-row {
+    padding: 16px 0 0;
+  }
+}
