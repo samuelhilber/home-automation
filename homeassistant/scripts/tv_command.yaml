@@ -21,8 +21,8 @@ tv_command:
   variables:
     tv: media_player.schlafzimmer_samueltv
     # Fully Kiosk Browser integration (default names, adjust after setup).
-    kiosk_foreground: button.fully_kiosk_browser_bring_to_foreground
-    kiosk_start_page: button.fully_kiosk_browser_load_start_url
+    kiosk_foreground: button.schlafzimmer_schlafzimmer_in_den_vordergrund_rucken
+    kiosk_start_page: button.schlafzimmer_schlafzimmer_start_url_laden
   sequence:
     - choose:
         - conditions: "{{ command == 'wake' }}"

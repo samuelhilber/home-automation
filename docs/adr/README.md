@@ -34,5 +34,5 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-028](028-calendars-imported-directly-by-the-api.md) | Calendars are imported directly by the API, starting with read-only links | Accepted |
 | [ADR-029](029-settings-stored-where-they-are-used.md) | Settings are stored where they are used (Home Assistant helpers or the API's state file) | Accepted |
 | [ADR-030](030-activity-feed-from-home-assistant-logbook.md) | The activity feed comes from the Home Assistant logbook | Accepted |
-| [ADR-031](031-fully-kiosk-brought-to-front-by-home-assistant.md) | Home Assistant brings Fully Kiosk to the front after the TV wakes | Proposed |
+| [ADR-031](031-fully-kiosk-brought-to-front-by-home-assistant.md) | Home Assistant brings Fully Kiosk to the front after the TV wakes | Accepted |
 | [ADR-099](099-leave-home-detection-comes-last.md) | The leave-home detection is fixed last | Accepted |

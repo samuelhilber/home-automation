@@ -1,6 +1,6 @@
 # ADR-031: Home Assistant brings Fully Kiosk to the front after the TV wakes
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-06
 
 ## Context
@@ -20,4 +20,4 @@ The Remote Admin password lives in the integration in Home Assistant, not in YAM
 - Needs Fully Kiosk Plus on the TV and a working network path from the Pi to the TV.
 - If Google TV ends Fully Kiosk in standby, the app does not answer and the morning screen does not appear. Fallbacks, to be decided if that happens: start the app through the Bravia source list (`media_player.select_source`), or through ADB or the Android TV Remote integration.
 - The change stays in the one TV script, as required by the rule that all TV commands go through one place.
-- Not yet tested on the real TV.
+- Tested on 2026-11-06: `tv_command wake` from the HA actions page woke the TV and the morning screen appeared. Not yet tested through a real alarm run.
