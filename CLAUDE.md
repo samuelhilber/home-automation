@@ -75,4 +75,4 @@ home-automation/
 
 ## Current status
 
-Planning is done; hardware is bought and the Raspberry Pi is on order. UI prototypes for the TV and the admin/phone view are built and signed off by Samuel (`prototypes/`); they still need a React rewrite with CSS/JS in their own files before real use. PDF exports only on Samuel's explicit request. Details, open items and the backend spec for the mockup: [`docs/HANDOFF.md`](docs/HANDOFF.md).
+Planning is done; the Raspberry Pi is set up and runs Home Assistant in Docker (ADR-024). The alarm chain (weekday alarm, TV wake, TV switch-off) is built and tested live on the Pi. UI prototypes for the TV and the admin/phone view are built and signed off by Samuel (`prototypes/`); they still need a React rewrite with CSS/JS in their own files before real use. PDF exports only on Samuel's explicit request. Details, open items and the backend spec for the mockup: [`docs/HANDOFF.md`](docs/HANDOFF.md).
