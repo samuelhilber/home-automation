@@ -6,9 +6,25 @@ alarm_ring:
   mode: single
   variables:
     zone: media_player.kinderzimmer_kinderzimmer
+    tv: media_player.schlafzimmer_samueltv
     playlist: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
     volume: 0.05
   sequence:
+    # The TV comes first: the Arc is wired to it and drops a running stream
+    # when the TV wakes up and takes over the audio. script.turn_on does not
+    # wait for the TV script, so a broken TV raises no error here; the timeout
+    # below lets the music start anyway.
+    - action: script.turn_on
+      target:
+        entity_id: script.tv_command
+      data:
+        variables:
+          command: wake
+    - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
+      timeout: "00:00:40"
+      continue_on_timeout: true
+    # Give the Arc a moment to switch to the TV input before the stream starts.
+    - delay: "00:00:05"
     - action: media_player.volume_set
       target:
         entity_id: "{{ zone }}"
@@ -20,14 +36,6 @@ alarm_ring:
       data:
         media_content_type: playlist
         media_content_id: "{{ playlist }}"
-    # script.turn_on starts the TV script without waiting for it, so a slow or
-    # broken TV can neither delay nor stop the alarm sound.
-    - action: script.turn_on
-      target:
-        entity_id: script.tv_command
-      data:
-        variables:
-          command: wake
     # Sonos can report "paused" while the stream starts, which would end the
     # alarm at once; wait until playback has settled before watching for it.
     - delay: "00:00:20"
