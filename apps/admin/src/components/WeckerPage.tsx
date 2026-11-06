@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import Icon from './Icon'
 import WeckerEditor from './WeckerEditor'
-import { alarmsApi, describeError } from '../api'
+import { alarmsApi, describeError, settingsApi } from '../api'
+import { useStatus } from '../useStatus'
 import { DAY_LABELS, type Alarm } from '../mockData'
 import './WeckerPage.css'
 
@@ -15,6 +16,7 @@ export default function WeckerPage() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
   const [editing, setEditing] = useState<Editing>(null)
+  const { data: settings } = useStatus(settingsApi.get, 300000)
 
   function load() {
     alarmsApi
@@ -144,6 +146,7 @@ export default function WeckerPage() {
             onSave={save}
             onDelete={remove}
             onClose={() => setEditing(null)}
+            defaultVolume={settings?.defaultVolume}
           />
         )}
       </div>

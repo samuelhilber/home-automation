@@ -13,7 +13,9 @@ const WEEKDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 // weekend, so asking it on Saturday would silence every weekend alarm (ADR-012,
 // ADR-025). If the sensor is unavailable on a weekday the alarm stays silent and
 // the Sonos backup alarm wakes Samuel, same as the hand-written alarm.
-const HOLIDAY_CHECK = "{{ now().weekday() >= 5 or is_state('binary_sensor.workday_sensor_ch_sg', 'on') }}"
+// "Ring on public holidays" (ADR-029) lets the alarm ring on a Mon-Fri holiday.
+const HOLIDAY_CHECK =
+  "{{ now().weekday() >= 5 or is_state('input_boolean.ring_on_holidays', 'on') or is_state('binary_sensor.workday_sensor_ch_sg', 'on') }}"
 
 export type AutomationConfig = Record<string, unknown>
 

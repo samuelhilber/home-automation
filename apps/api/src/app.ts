@@ -6,11 +6,13 @@ import { configIdFor, fromAutomation, toAutomation } from './automation.ts'
 import { HaUnreachableError, type HaClient } from './ha.ts'
 import { SOURCES, ZONES } from './mapping.ts'
 import { NoProbe, type Probe, type SystemStatus } from './probe.ts'
+import { applySettings, parseSettingsPatch, readSettings, SettingsStore } from './settings.ts'
 import * as status from './status.ts'
 
 // `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
 export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe: Probe = new NoProbe(),
   calendar: CalendarImporter = new CalendarImporter([], httpFetcher, undefined),
+  settings: SettingsStore = new SettingsStore(undefined),
 ) {
   const app = Fastify({ logger: false })
 
@@ -105,6 +107,19 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe
       ),
     ])
     return { probe: reading !== null, reading, homeAssistant }
+  })
+
+  // Settings (ADR-029): Home Assistant helpers plus the default volume kept here.
+  const loadSettings = async () => {
+    const [states, alarms] = await Promise.all([ha.getStates(), listAlarms()])
+    return readSettings(settings, states, alarms, now())
+  }
+  app.get('/api/settings', loadSettings)
+  app.patch('/api/settings', async (req, reply) => {
+    const parsed = parseSettingsPatch(req.body)
+    if (!parsed.ok) return reply.code(400).send({ error: parsed.error })
+    await applySettings(ha, settings, parsed.value)
+    return loadSettings()
   })
 
   // Calendars (ADR-028). Reading is open to the TV and the admin app; the links never appear here.

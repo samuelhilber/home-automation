@@ -30,6 +30,7 @@ export type NextAlarm = {
 export async function nextAlarm(ha: HaClient, alarms: Alarm[], states: HaState[], at: Date): Promise<NextAlarm | null> {
   const now = zurichClock(at)
   const weekdayOn = find(states, WEEKDAY_ALARM.entity)?.state === 'on'
+  const ringOnHolidays = find(states, ENTITIES.ringOnHolidays)?.state === 'on' // ADR-029
   const workdays = new Map<string, boolean>()
   const isWorkday = async (date: string) => {
     if (!workdays.has(date)) workdays.set(date, await ha.isWorkday(date))
@@ -47,7 +48,7 @@ export async function nextAlarm(ha: HaClient, alarms: Alarm[], states: HaState[]
 
     const upcoming = candidates.filter((c) => inDays > 0 || c.time > now.time).sort((x, y) => x.time.localeCompare(y.time))
     if (upcoming.length === 0) continue
-    if (weekday <= 4 && !(await isWorkday(date))) continue
+    if (weekday <= 4 && !ringOnHolidays && !(await isWorkday(date))) continue
     return { ...upcoming[0], date, weekday, inDays }
   }
   return null
