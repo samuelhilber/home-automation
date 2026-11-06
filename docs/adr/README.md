@@ -29,3 +29,6 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-023](023-no-watch-overview.md) | The watch overview is left out | Accepted |
 | [ADR-024](024-raspberry-pi-os-and-docker.md) | Raspberry Pi OS with Home Assistant in Docker replaces Home Assistant OS | Accepted |
 | [ADR-025](025-alarms-managed-through-home-assistant-config-api.md) | Alarms made in the management web app are stored as Home Assistant automations | Accepted |
+| [ADR-099](099-leave-home-detection-comes-last.md) | The leave-home detection is fixed last | Accepted |
+| [ADR-026](026-api-serves-the-apps-from-the-pi.md) | The backend serves the admin app and the TV page from the Raspberry Pi | Accepted |
+| [ADR-099](099-leave-home-detection-comes-last.md) | The leave-home detection is fixed last | Accepted |
