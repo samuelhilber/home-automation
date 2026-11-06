@@ -15,9 +15,10 @@ type Props = {
   onSave: (alarm: Alarm) => void
   onDelete: (id: string) => void
   onClose: () => void
+  defaultVolume?: number // from the settings (ADR-029), for a new alarm
 }
 
-export default function WeckerEditor({ alarm, onSave, onDelete, onClose }: Props) {
+export default function WeckerEditor({ alarm, onSave, onDelete, onClose, defaultVolume = 5 }: Props) {
   const isNew = !alarm
   const [draft, setDraft] = useState<Alarm>(
     alarm ?? {
@@ -26,7 +27,7 @@ export default function WeckerEditor({ alarm, onSave, onDelete, onClose }: Props
       days: [0, 1, 2, 3, 4],
       zone: alarmZones[0],
       source: alarmSources[0],
-      volume: 5,
+      volume: defaultVolume,
       wakeTv: true,
       on: true,
     },

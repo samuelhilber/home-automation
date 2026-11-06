@@ -87,6 +87,21 @@ export const statusApi = {
   connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
 }
 
+// Settings (ADR-029). null means Home Assistant does not answer or the helper is missing.
+export type Settings = {
+  timeZone: string
+  skipHolidays: boolean | null
+  defaultVolume: number
+  morningScreenMaxMinutes: number | null
+  updateNotice: string | null // HH:MM
+  installWindow: { from: string; to: string }
+}
+export const settingsApi = {
+  get: () => request<Settings>('GET', '/api/settings'),
+  update: (patch: Partial<Pick<Settings, 'skipHolidays' | 'defaultVolume' | 'morningScreenMaxMinutes' | 'updateNotice'>>) =>
+    request<Settings>('PATCH', '/api/settings', patch),
+}
+
 // Text for the user; 502 means the api works but Home Assistant does not answer.
 export function describeError(err: unknown): string {
   if (err instanceof ApiError) {

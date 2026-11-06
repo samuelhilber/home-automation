@@ -17,6 +17,8 @@ export interface HaClient {
   getStates(): Promise<HaState[]>
   getDailyForecast(weatherEntity: string): Promise<HaForecastDay[]>
   listConfigEntries(): Promise<HaConfigEntry[]>
+  // Calls a service without a response (the settings helpers, ADR-029). Throws if Home Assistant refuses.
+  callService(domain: string, service: string, data: Record<string, unknown>): Promise<void>
   // Asks the Workday sensor about a date (YYYY-MM-DD). Answers true when in doubt.
   isWorkday(date: string): Promise<boolean>
 }
@@ -102,6 +104,12 @@ export class HttpHaClient implements HaClient {
 
   async listConfigEntries(): Promise<HaConfigEntry[]> {
     return (await (await this.call('GET', '/api/config/config_entries/entry')).json()) as HaConfigEntry[]
+  }
+
+  async callService(domain: string, service: string, data: Record<string, unknown>): Promise<void> {
+    const res = await this.call('POST', `/api/services/${domain}/${service}`, data)
+    // call() lets a 404 through; for a service call that means a missing service, which is an error.
+    if (!res.ok) throw new Error(`Home Assistant answered ${res.status} for ${domain}.${service}`)
   }
 
   async isWorkday(date: string): Promise<boolean> {

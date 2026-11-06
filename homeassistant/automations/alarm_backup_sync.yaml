@@ -15,8 +15,11 @@
         check_date: "{{ (now() + timedelta(days=1)).date() }}"
       response_variable: tomorrow
       continue_on_error: true
+    # With "Ring on public holidays" (ADR-029) tomorrow counts if it is Mon-Fri,
+    # holiday or not; the alarm and its backup must agree.
     - if: >-
-        {{ (tomorrow | default({})).get('binary_sensor.workday_sensor_ch_sg', {}).get('workday', true) }}
+        {{ (tomorrow | default({})).get('binary_sensor.workday_sensor_ch_sg', {}).get('workday', true)
+           or (is_state('input_boolean.ring_on_holidays', 'on') and (now() + timedelta(days=1)).weekday() < 5) }}
       then:
         # Must match the time in alarm_weekdays_0630.
         - action: script.alarm_backup
