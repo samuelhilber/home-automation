@@ -1,0 +1,121 @@
+.cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+  padding: 0;
+  margin-bottom: 20px;
+}
+.cta-copy {
+  padding: 24px;
+}
+.cta h2 {
+  font-size: 21px;
+  margin: 20px 0 8px;
+}
+.cta p {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0 0 22px;
+  max-width: 56ch;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border: 0;
+  border-radius: 4px;
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  text-align: left;
+}
+.cta-btn span {
+  flex: 1;
+}
+.cta-btn .icon {
+  font-size: 16px;
+}
+.cta-btn:hover {
+  filter: brightness(1.07);
+}
+.cta-btn:active {
+  transform: translateY(1px);
+}
+.cta-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.cta-art {
+  position: relative;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border-left: 1px solid var(--border);
+}
+.cta-art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(5, 10, 7, 0.15), rgba(5, 10, 7, 0.55));
+}
+.ready {
+  position: relative;
+  width: 112px;
+  height: 72px;
+  border: 1.5px solid var(--accent);
+  background: rgba(6, 14, 9, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.ready .icon {
+  font-size: 20px;
+}
+.tv-line {
+  position: relative;
+  text-align: center;
+  font-size: 12px;
+  color: #dbe9df;
+}
+.tv-line i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  margin-right: 8px;
+  vertical-align: 2px;
+}
+.tv-line small {
+  display: block;
+  font-size: 10.5px;
+  color: #9fb7a6;
+  margin-top: 4px;
+}
+
+@media (max-width: 1100px) {
+  .cta {
+    grid-template-columns: 1fr;
+  }
+  .cta-art {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+}
+@media (max-width: 860px) {
+  .cta-btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,73 @@
+.dlg-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(4, 8, 5, 0.75);
+  display: grid;
+  place-items: start center;
+  padding: 72px 16px 24px;
+  overflow-y: auto;
+}
+.dlg {
+  width: 100%;
+  max-width: 520px;
+  border-color: var(--accent);
+}
+.dlg-empty {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 18px 0 0;
+}
+.upd {
+  margin-top: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ver {
+  margin-top: 6px;
+  font-size: 13px;
+}
+.ver s {
+  color: var(--faint);
+}
+.ver span {
+  color: var(--accent);
+}
+.ver a {
+  color: var(--accent);
+}
+.dlg-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.dlg-acts {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+.queue {
+  margin-top: 20px;
+  font-size: 12.5px;
+}
+.q-title {
+  display: block;
+  margin-top: 16px;
+}
+.q-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  color: var(--text);
+}
+.q-line.muted {
+  color: var(--faint);
+}
+.q-line .ok {
+  color: var(--accent);
+}
+.q-line .bad {
+  color: #ff8a8a;
+}

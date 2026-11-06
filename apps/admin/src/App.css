@@ -1,0 +1,22 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 860px) {
+  .app {
+    flex-direction: column;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+  .main {
+    order: 1;
+  }
+}

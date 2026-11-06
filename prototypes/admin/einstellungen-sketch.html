@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Einstellungen – Skizze</title>
+<style>
+  :root{--bg:#0a110c;--surface:#121d15;--surface-2:#0e1711;--border:#223328;--border-strong:#2f4a38;--accent:#7cf29b;--accent-dim:#3d6b4a;--accent-soft:rgba(124,242,155,.12);--text:#e8f1e6;--muted:#95aa9b;--faint:#5d7064;--r:6px}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 'JetBrains Mono',ui-monospace,Consolas,monospace;padding:24px 16px}
+  h1{font-size:18px;margin:0 0 4px}
+  h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px}
+  .wrap{display:grid;gap:16px;max-width:760px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+  .desc{color:var(--muted);font-size:12px;margin:0 0 8px}
+  .line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--border);font-size:12.5px}
+  .line small{display:block;color:var(--faint);font-size:11px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px}
+  .dot.off{background:#ff8a8a}.dot.none{background:var(--faint)}
+  .btn{background:transparent;color:var(--text);border:1px solid var(--border-strong);border-radius:var(--r);padding:3px 10px;font:inherit;font-size:11.5px}
+  .btn.p{background:var(--accent);color:#06150c;border-color:var(--accent);font-weight:700}
+  .sw{width:38px;height:22px;border-radius:11px;background:var(--surface-2);border:1px solid var(--border-strong);position:relative;flex:none}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--faint)}
+  .sw.on{background:var(--accent-dim);border-color:var(--accent)}.sw.on::after{left:19px;background:var(--accent)}
+  .val{color:var(--text);font-weight:700}
+  .tag{font-size:10.5px;color:var(--faint);border:1px solid var(--border);border-radius:3px;padding:0 6px;margin-left:8px;font-weight:400;letter-spacing:0;text-transform:none}
+  .note{color:var(--faint);font-size:12px;margin:20px 0 0;max-width:760px}
+</style>
+</head>
+<body>
+<h1>Einstellungen – Skizze</h1>
+<p class="sub">Skizze zur Abnahme. Keine Passwörter, Schlüssel oder Adressen, nur Status.</p>
+
+<div class="wrap">
+  <section class="card">
+    <h2>Verbundene Konten und Geräte</h2>
+    <p class="desc">Status der Verbindungen. Die Kalender-Schalter bleiben unter „Kalender-Import“.</p>
+    <div class="line"><span><i class="dot"></i>iCloud</span><button class="btn">Trennen</button></div>
+    <div class="line"><span><i class="dot"></i>Outlook Arbeit</span><button class="btn">Trennen</button></div>
+    <div class="line"><span><i class="dot none"></i>Outlook Schule<small>Nicht angemeldet</small></span><button class="btn p">Verbinden</button></div>
+    <div class="line"><span><i class="dot"></i>Spotify<small>Quelle für die Wecker</small></span><button class="btn">Trennen</button></div>
+    <div class="line"><span><i class="dot"></i>Sonos<small>4 Lautsprecher gefunden</small></span><span class="val">verbunden</span></div>
+    <div class="line"><span><i class="dot off"></i>Sony-TV (Bravia)<small>Nicht erreichbar · Adresse prüfen</small></span><button class="btn">Neu verbinden</button></div>
+    <div class="line"><span><i class="dot"></i>Home Assistant</span><span class="val">läuft</span></div>
+    <div class="line"><span><i class="dot"></i>Tailscale<small>Zugriff von unterwegs</small></span><span class="val">aktiv</span></div>
+    <div class="line"><span><i class="dot"></i>Watchdog-Dienst<small>Externer Dienst</small></span><span class="val">erreicht</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Standardwerte</h2>
+    <div class="line"><span>Zeitzone</span><span class="val">Europe/Zurich</span></div>
+    <div class="line"><span>Feiertage St. Gallen überspringen</span><span class="sw on"></span></div>
+    <div class="line"><span>Standard-Lautstärke für neue Wecker</span><span class="val">5</span></div>
+    <div class="line"><span>Morgenbildschirm höchstens<small>Weniger, wenn du das Haus verlässt</small></span><span class="val">15 Min.</span></div>
+  </section>
+
+  <section class="card">
+    <h2>Benachrichtigungen und Updates</h2>
+    <div class="line"><span>Tägliche Meldung über wartende Updates<small>aufs Handy</small></span><span class="val">21:00</span></div>
+    <div class="line"><span>Sperrzeit für Installationen <span class="tag">nur lesen</span><small>Ab 21:00 bis 2 Std. nach dem letzten Wecker</small></span><span class="val">21:00–08:30</span></div>
+  </section>
+</div>
+<p class="note">Alles erfundene Beispielwerte. Knöpfe wie „Verbinden“ sind in der ersten Version noch ohne Funktion, bis das Backend da ist.</p>
+</body>
+</html>
