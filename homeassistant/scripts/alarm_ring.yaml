@@ -20,6 +20,10 @@ alarm_ring:
       data:
         variables:
           command: wake
+    # The 15 minutes count from the wake command, not from the stop (ADR-011).
+    - action: script.turn_on
+      target:
+        entity_id: script.tv_morning_timer
     - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
       timeout: "00:00:40"
       continue_on_timeout: true
