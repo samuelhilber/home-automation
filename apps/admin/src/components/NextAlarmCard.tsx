@@ -1,8 +1,12 @@
 import Icon from './Icon'
-import { nextAlarm } from '../mockData'
+import { statusApi } from '../api'
+import { dayLabel, longDate, timezoneLabel, weekdayName } from '../format'
+import { useStatus } from '../useStatus'
 import './NextAlarmCard.css'
 
 export default function NextAlarmCard() {
+  const { data: next, loaded, failed } = useStatus(statusApi.nextAlarm)
+
   return (
     <section className="card focus">
       <div className="card-head">
@@ -10,23 +14,33 @@ export default function NextAlarmCard() {
           <Icon name="alarm" />
           Nächster Wecker
         </span>
-        <span className="status">
-          <i />
-          Aktiv
-        </span>
+        {next && (
+          <span className="status">
+            <i />
+            Aktiv
+          </span>
+        )}
       </div>
       <div className="alarm">
-        <div className="big tabular">{nextAlarm.time}</div>
+        <div className="big tabular">{next ? next.time : '–'}</div>
         <div className="when">
-          <small>{nextAlarm.dayLabel}</small>
-          <b>{nextAlarm.weekday}</b>
-          <span className="tabular">{nextAlarm.date}</span>
+          {next ? (
+            <>
+              <small>{dayLabel(next.inDays)}</small>
+              <b>{weekdayName(next.weekday)}</b>
+              <span className="tabular">{longDate(next.date)}</span>
+            </>
+          ) : (
+            <small>
+              {failed && !loaded ? 'Keine Verbindung zu Home Assistant' : loaded ? 'Kein Wecker eingeschaltet' : 'Lädt …'}
+            </small>
+          )}
         </div>
       </div>
       <div className="split">
         <div className="kv">
           <small>Zeitzone</small>
-          <b>{nextAlarm.timezone}</b>
+          <b>{timezoneLabel()}</b>
         </div>
         <button type="button" className="link">
           Wecker verwalten

@@ -25,7 +25,7 @@ export default function App() {
           className="stage"
           style={{ '--s': scale.toFixed(4), '--dx': `${dx}px`, '--dy': `${dy}px` } as CSSProperties}
         >
-          <WeatherPanel now={now} />
+          <WeatherPanel />
           <CalendarPanel now={now} />
           <TodayPanel now={now} />
           <ClockPanel now={now} />

@@ -1,24 +1,6 @@
-// No backend yet (see docs/HANDOFF.md) — placeholder values matching the signed-off prototype.
-
-export const nextAlarm = {
-  time: '06:30',
-  dayLabel: 'Morgen',
-  weekday: 'Mittwoch',
-  date: '04. November 2026',
-  timezone: 'Europe/Zurich · MEZ (UTC+01:00)',
-}
-
-export const backupAlarm = {
-  on: true,
-  time: '06:35',
-  note: '5 Min. nach Hauptwecker',
-}
-
-export const tvStatus = {
-  room: 'Wohnzimmer-TV',
-  connected: true,
-  detail: 'HDMI-1 / CEC bereit',
-}
+// Placeholder values for what the backend cannot deliver yet (calendars, Pi system values, watchdog,
+// activity feed, settings, updates). Next alarm, backup alarm, TV, last backup and the Home Assistant
+// connections come from apps/api (see api.ts, statusApi).
 
 export const systemStatus = {
   checkedSecondsAgo: 12,
@@ -38,13 +20,6 @@ export const activityFeed = [
 // Wecker page. Weekdays are 0 = Mo ... 6 = So.
 // System page (placeholder values, matching the signed-off sketch).
 export const systemPage = {
-  backupAlarm: {
-    on: true,
-    time: '06:35',
-    zone: 'Wohnzimmer-Gruppe',
-    offset: '5 Min. nach Hauptwecker',
-    lastSync: 'gestern, 21:00',
-  },
   watchdog: { ok: true, lastCheckIn: '20:46', agoSeconds: 12, externalReached: true },
   pi: {
     name: 'morgenpi',
@@ -59,7 +34,6 @@ export const systemPage = {
     network: 'stabil',
     homeAssistant: 'läuft (Docker)',
   },
-  lastBackup: { ok: true, time: '03:00', when: 'heute, 03:00', error: '' },
 }
 
 // Kalender-Import page (made-up data, no real calendar content).
@@ -128,14 +102,11 @@ export type Connection = {
   action?: string // button label
 }
 
+// Rows without a Home Assistant source yet (calendars, Tailscale, watchdog). The rest comes from the api.
 export const connections: Connection[] = [
   { id: 'icloud', name: 'iCloud', state: 'ok', action: 'Trennen' },
   { id: 'work', name: 'Outlook Arbeit', state: 'ok', action: 'Trennen' },
   { id: 'school', name: 'Outlook Schule', state: 'none', detail: 'Nicht angemeldet', action: 'Verbinden' },
-  { id: 'spotify', name: 'Spotify', state: 'ok', detail: 'Quelle für die Wecker', action: 'Trennen' },
-  { id: 'sonos', name: 'Sonos', state: 'ok', detail: '4 Lautsprecher gefunden', value: 'verbunden' },
-  { id: 'tv', name: 'Sony-TV (Bravia)', state: 'down', detail: 'Nicht erreichbar · Adresse prüfen', action: 'Neu verbinden' },
-  { id: 'ha', name: 'Home Assistant', state: 'ok', value: 'läuft' },
   { id: 'tailscale', name: 'Tailscale', state: 'ok', detail: 'Zugriff von unterwegs', value: 'aktiv' },
   { id: 'watchdog', name: 'Watchdog-Dienst', state: 'ok', detail: 'Externer Dienst', value: 'erreicht' },
 ]
