@@ -17,3 +17,7 @@ secrets.yaml
 Thumbs.db
 .vscode/
 .idea/
+
+# Node web apps (apps/*)
+node_modules/
+dist/

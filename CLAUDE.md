@@ -40,7 +40,7 @@ If a task seems to need any of this, ask Samuel to provide it locally (e.g. in `
 ## Key decisions to respect
 
 - **Platform:** Raspberry Pi OS on a Raspberry Pi 5 8 GB, booting from an SSD, passive case in the bedroom; Home Assistant runs in Docker (the Container image), not Home Assistant OS, so there is no Supervisor or add-on store — check HACS before custom code instead (ADR-001 superseded, ADR-017, ADR-024).
-- **Alarms:** Home Assistant owns them; Sonos only plays sound (ADR-002). Several alarms on single weekdays or custom weekday groups, no snooze; stop via Sonos button (pause detection), phone, or after 15 minutes (ADR-004). Skip St. Gallen public holidays via the Workday integration (ADR-012).
+- **Alarms:** Home Assistant owns them; Sonos only plays sound (ADR-002). Several alarms on single weekdays or custom weekday groups, no snooze; stop via Sonos button (pause detection), phone, or after 15 minutes (ADR-004). Skip St. Gallen public holidays via the Workday integration (ADR-012). Alarms made in the management web app are Home Assistant automations with the id prefix `app_alarm_`, written by `apps/api` through the config API and stored in `automations.yaml`; the backend keeps no alarm database and the hand-written ones stay in `automations/` (ADR-025).
 - **Music:** Home Assistant starts the Spotify playlist directly and plays it on the chosen Sonos zone; fixed volume (ADR-014). Starting a Sonos favourite (ADR-013) was rejected.
 - **Alarm safety net:** one Sonos alarm stored on the speaker as backup, synced nightly to 10 minutes after the next alarm, switched off by Home Assistant only after the real alarm was stopped (ADR-020). Sonos alarms have no names: Home Assistant finds the backup by its internal alarm ID and labels it "Backup", so never match it by name or create a second one. A watchdog with an outside dead-man's-switch service (ADR-021). Never weaken these.
 - **TV:** Fully Kiosk shows the dashboards (ADR-006); normal Google TV home screen in 1.0, Projectivy only in 2.0 (ADR-015). The morning screen stays on at most 15 minutes, less when Samuel leaves home (ADR-011). All TV commands go through one script, so a broken integration is fixed in one place. The TV loads its pages from the Pi, not from files bundled on the TV itself (ADR-022).
@@ -61,6 +61,10 @@ home-automation/
 │   ├── versions/      PDF exports of the project documentation
 │   ├── adr/           One Markdown file per ADR, NNN-short-title.md
 │   └── HANDOFF.md      Where things stand and what comes next
+├── apps/
+│   ├── admin/         Management web app (React)
+│   ├── tv/            Morning screen on the TV (React)
+│   └── api/           Backend (Node + TypeScript, Fastify); alarms through the Home Assistant config API (ADR-025)
 ├── homeassistant/     The Home Assistant configuration under version control
 └── prototypes/        UI prototypes (tv-kiosk, admin), signed off by Samuel; still inline-styled HTML, to be rewritten in React before real use
 ```

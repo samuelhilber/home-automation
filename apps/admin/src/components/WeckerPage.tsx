@@ -1,35 +1,65 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Icon from './Icon'
 import WeckerEditor from './WeckerEditor'
-import { DAY_LABELS, initialAlarms, type Alarm } from '../mockData'
+import { alarmsApi, describeError } from '../api'
+import { DAY_LABELS, type Alarm } from '../mockData'
 import './WeckerPage.css'
 
 // null = editor closed, 'new' = creating, otherwise the id being edited
 type Editing = string | 'new' | null
 
+const byTime = (list: Alarm[]) => [...list].sort((a, b) => a.time.localeCompare(b.time))
+
 export default function WeckerPage() {
-  const [alarms, setAlarms] = useState<Alarm[]>(initialAlarms)
+  const [alarms, setAlarms] = useState<Alarm[] | null>(null) // null = still loading
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [editing, setEditing] = useState<Editing>(null)
 
-  const editedAlarm = alarms.find((a) => a.id === editing)
-
-  function toggle(id: string) {
-    setAlarms((list) => list.map((a) => (a.id === id ? { ...a, on: !a.on } : a)))
+  function load() {
+    alarmsApi
+      .list()
+      .then((list) => {
+        setLoadError(null)
+        setAlarms(byTime(list))
+      })
+      .catch((err) => setLoadError(describeError(err)))
   }
 
-  function save(alarm: Alarm) {
-    setAlarms((list) => {
-      const exists = list.some((a) => a.id === alarm.id)
-      const next = exists ? list.map((a) => (a.id === alarm.id ? alarm : a)) : [...list, alarm]
-      return next.sort((a, b) => a.time.localeCompare(b.time))
+  useEffect(load, [])
+
+  const editedAlarm = alarms?.find((a) => a.id === editing)
+
+  // Every change goes to the api first; the list only changes when it worked.
+  async function run(action: () => Promise<void>) {
+    setActionError(null)
+    try {
+      await action()
+    } catch (err) {
+      setActionError(describeError(err))
+    }
+  }
+
+  const toggle = (alarm: Alarm) =>
+    run(async () => {
+      const updated = await alarmsApi.setOn(alarm.id, !alarm.on)
+      setAlarms((list) => list && list.map((a) => (a.id === updated.id ? updated : a)))
     })
-    setEditing(null)
-  }
 
-  function remove(id: string) {
-    setAlarms((list) => list.filter((a) => a.id !== id))
-    setEditing(null)
-  }
+  const save = (alarm: Alarm) =>
+    run(async () => {
+      const { id: _id, ...input } = alarm
+      const saved = editing === 'new' ? await alarmsApi.create(input) : await alarmsApi.update(alarm)
+      setAlarms((list) => byTime([...(list ?? []).filter((a) => a.id !== saved.id), saved]))
+      setEditing(null)
+    })
+
+  const remove = (id: string) =>
+    run(async () => {
+      await alarmsApi.remove(id)
+      setAlarms((list) => list && list.filter((a) => a.id !== id))
+      setEditing(null)
+    })
 
   return (
     <main className="content">
@@ -48,14 +78,29 @@ export default function WeckerPage() {
               <Icon name="alarm" />
               Wecker
             </span>
-            <button type="button" className="btn" onClick={() => setEditing('new')}>
+            <button type="button" className="btn" disabled={alarms === null} onClick={() => setEditing('new')}>
               + Neuer Wecker
             </button>
           </div>
 
+          {actionError && (
+            <div className="error" role="alert">
+              {actionError}
+            </div>
+          )}
+
           <ul className="alarm-list">
-            {alarms.length === 0 && <li className="alarm-empty">Noch kein Wecker angelegt.</li>}
-            {alarms.map((a) => (
+            {loadError && (
+              <li className="alarm-empty" role="alert">
+                {loadError}{' '}
+                <button type="button" className="btn ghost" onClick={load}>
+                  Nochmal versuchen
+                </button>
+              </li>
+            )}
+            {!loadError && alarms === null && <li className="alarm-empty">Wecker werden geladen …</li>}
+            {alarms?.length === 0 && <li className="alarm-empty">Noch kein Wecker angelegt.</li>}
+            {alarms?.map((a) => (
               <li key={a.id} className={`alarm-row${a.on ? '' : ' off'}${editing === a.id ? ' sel' : ''}`}>
                 <button type="button" className="alarm-open" onClick={() => setEditing(a.id)}>
                   <span className="alarm-time tabular">{a.time}</span>
@@ -78,7 +123,7 @@ export default function WeckerPage() {
                   role="switch"
                   aria-checked={a.on}
                   aria-label={`Wecker ${a.time}`}
-                  onClick={() => toggle(a.id)}
+                  onClick={() => toggle(a)}
                 >
                   <i />
                 </button>
