@@ -1,0 +1,61 @@
+.p-today {
+  grid-area: today;
+}
+.hours {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  flex: 1;
+  min-height: 0;
+}
+.hour {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  color: var(--faint);
+  position: relative;
+}
+.hour:last-child {
+  border-bottom: 0;
+}
+.hour.now time {
+  color: var(--accent);
+  font-weight: 700;
+}
+.hour.now::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 20%;
+  bottom: 20%;
+  width: 4px;
+  background: var(--accent);
+}
+.bar {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background: var(--accent-fill);
+  color: var(--accent-ink);
+}
+.bar::before {
+  content: '▶';
+  font-size: 11px;
+  margin-right: 12px;
+}
+.bar.grey {
+  background: var(--grey-fill);
+}
+.bar.outline {
+  background: transparent;
+  color: var(--text);
+  border: 2px solid var(--accent-fill);
+}

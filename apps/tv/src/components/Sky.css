@@ -1,0 +1,36 @@
+.sky {
+  position: fixed;
+  inset: 0;
+}
+.sky div {
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+  opacity: 0;
+  transition: opacity 90s linear;
+}
+.sky div.on {
+  opacity: 1;
+}
+/* veil keeps text readable over the picture */
+.sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--veil-top), var(--veil-bottom));
+  transition: background 90s linear;
+}
+.cycle .sky div,
+.cycle .sky::after {
+  transition-duration: 4s;
+}
+.instant .sky div,
+.instant .sky::after {
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky div,
+  .sky::after {
+    transition: none;
+  }
+}
