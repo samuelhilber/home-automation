@@ -15,8 +15,9 @@ tv_command:
       selector:
         select:
           options:
-            - wake
-            - off
+            # Quoted because an unquoted off is a boolean in YAML.
+            - "wake"
+            - "off"
   variables:
     tv: media_player.schlafzimmer_samueltv
   sequence:
