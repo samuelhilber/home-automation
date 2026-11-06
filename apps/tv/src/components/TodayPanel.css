@@ -1,74 +1,109 @@
 .p-today {
   grid-area: today;
+  --gutter: 86px;
 }
-.hours {
-  display: flex;
-  flex-direction: column;
+.axis {
+  position: relative;
   margin-top: 16px;
   flex: 1;
   min-height: 0;
+  border-top: 1px solid var(--line);
 }
-.hour {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 86px 1fr;
-  align-items: center;
-  gap: 14px;
+.hr {
+  display: flex;
+  align-items: flex-start;
   border-bottom: 1px solid var(--line);
   font-size: 15px;
   color: var(--faint);
-  position: relative;
 }
-.hour:last-child {
-  border-bottom: 0;
+.hr time {
+  padding-top: 4px;
 }
-.hour.now time {
+.hr.now time {
   color: var(--accent);
   font-weight: 700;
 }
-.hour.now::before {
-  content: '';
+.ev {
   position: absolute;
-  left: -26px;
-  top: 20%;
-  bottom: 20%;
-  width: 4px;
-  background: var(--accent);
-}
-.bar {
-  height: 34px;
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  font-size: 16px;
+  gap: 12px;
+  /* One line: title, then the time. A short event on a crowded axis stays readable. */
+  min-height: 26px;
+  padding: 2px 14px;
+  overflow: hidden;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.01em;
+  line-height: 1.25;
   background: var(--accent-fill);
   color: var(--accent-ink);
+  border-left: 5px solid var(--accent);
 }
-.bar::before {
-  content: '▶';
-  font-size: 11px;
-  margin-right: 12px;
+.ev small {
+  flex: none;
+  font-size: 13px;
+  font-weight: 400;
+  white-space: nowrap;
 }
-.bar.grey {
-  background: var(--grey-fill);
-}
-.bar.outline {
-  background: transparent;
-  color: var(--text);
-  border: 2px solid var(--accent-fill);
-}
-.bar-text {
+.ev-title {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.allday {
+/* over: dimmed, running: bright with an outline so it is the first thing the eye finds */
+.ev.past {
+  background: var(--grey-fill);
+  color: var(--accent-ink);
+  opacity: 0.55;
+  border-left-color: var(--grey-fill);
+}
+.ev.current {
+  background: var(--accent);
+  outline: 2px solid var(--text);
+}
+.more {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  font-style: normal;
+  font-size: 13px;
+}
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 3px solid var(--accent);
+  z-index: 2;
+  pointer-events: none;
+}
+.now-line::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.top {
+  display: grid;
+  gap: 6px;
   margin-top: 12px;
+}
+.allday {
   padding: 6px 16px;
   font-size: 15px;
   font-weight: 700;
   border: 2px solid var(--accent-fill);
   color: var(--text);
+}
+.allday i {
+  margin-left: 12px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--faint);
 }

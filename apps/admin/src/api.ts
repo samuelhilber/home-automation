@@ -61,7 +61,9 @@ export type CalendarEvent = {
   title: string
   date: string // YYYY-MM-DD, Zurich
   start: string | null
-  end: string | null
+  end: string | null // "24:00" when the event goes on after midnight
+  day: number // 1-based position of this entry within a multi-day event
+  days: number // how many days the event covers
   allDay: boolean
   series: boolean
   shown: boolean

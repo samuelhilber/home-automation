@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TV-Zeiten – Skizze</title>
+<style>
+  :root{--bg:#0a110c;--panel:#101b14;--line:rgba(160,190,168,.24);--accent:#7cf29b;--fill:#56c96d;--ink:#06150c;--grey:#8a948c;--text:#e8f1e6;--muted:#a3b4a8;--faint:#7d9083}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 'JetBrains Mono',ui-monospace,Consolas,monospace;padding:24px 16px}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px;max-width:900px}
+  h2{font-size:12px;letter-spacing:.12em;text-transform:uppercase;margin:28px 0 10px;color:var(--muted)}
+  .row{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+  .panel{background:var(--panel);border:1px solid var(--line);padding:16px;width:420px}
+  .head{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .note{color:var(--faint);font-size:12px;margin:6px 0 0;width:420px}
+  /* Heute: Zeitachse */
+  .axis{position:relative;height:340px;border-top:1px solid var(--line)}
+  .hr{position:absolute;left:0;right:0;border-bottom:1px solid var(--line);font-size:11px;color:var(--faint)}
+  .hr span{position:absolute;top:2px;left:0}
+  .ev{position:absolute;background:var(--fill);color:var(--ink);font-size:12px;font-weight:700;padding:2px 6px;overflow:hidden;border-left:4px solid var(--accent)}
+  .ev small{display:block;font-weight:400;font-size:10.5px}
+  .ev.past{background:#3a4a3f;color:var(--muted);border-left-color:var(--grey)}
+  .ev.cur{background:var(--accent);outline:2px solid var(--text)}
+  .now{position:absolute;left:0;right:0;height:0;border-top:2px solid var(--accent);z-index:2}
+  .now::before{content:"";position:absolute;left:-6px;top:-5px;width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .top{display:grid;gap:4px;margin-bottom:8px}
+  .bar{border:2px solid var(--fill);padding:3px 10px;font-size:12px;font-weight:700}
+  .bar i{font-style:normal;color:var(--faint);font-weight:400;margin-left:8px}
+  .more{position:absolute;right:0;font-size:11px;color:var(--accent);font-weight:700}
+  /* Wochenleiste */
+  .strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px}
+  .d{border:1px solid var(--line);padding:6px 0 28px;position:relative}
+  .d b{display:block;font-size:18px}
+  .d.t{border-color:var(--accent)}
+  .cnt{position:absolute;bottom:6px;left:0;right:0;font-size:11px;color:var(--accent);font-weight:700}
+  .span{position:absolute;bottom:22px;left:-5px;right:-5px;height:5px;background:var(--fill)}
+  .span.s{left:6px}.span.e{right:6px}
+  .lab{font-size:11px;color:var(--muted);margin-top:6px}
+  ul.rules{margin:0;padding-left:18px;max-width:900px;color:var(--text)}
+  ul.rules li{margin:4px 0}
+  .bad{color:#ff8a8a}
+</style>
+</head>
+<body>
+<h1>TV-Zeiten – Skizze zur Abnahme</h1>
+<p class="sub">So sollen „Heute“ und die Wochenleiste auf dem TV Zeiten zeigen. Alles erfundene Beispieldaten. Gebaut wird erst nach deiner Abnahme.</p>
+
+<h2>Was heute nicht stimmt</h2>
+<ul class="rules">
+  <li><span class="bad">Nur 08–17 Uhr:</span> ein Termin um 07:00 oder 19:00 fehlt ganz.</li>
+  <li><span class="bad">Nur der Start zählt:</span> ein Termin von 10:00 bis 12:30 steht als eine Zeile bei 10:00, ohne Länge.</li>
+  <li><span class="bad">Gleichzeitige Termine</span> werden zu einer Textzeile zusammengeklebt.</li>
+  <li><span class="bad">Mehrtägige Termine</span> erscheinen nur am ersten Tag, ein Termin, der gestern begann, fehlt heute.</li>
+  <li><span class="bad">Vergangenes</span> sieht aus wie Kommendes.</li>
+</ul>
+
+<h2>Heute – drei Tage zum Vergleichen</h2>
+<div class="row" id="today"></div>
+
+<h2>Wochenleiste</h2>
+<div class="row">
+  <div>
+    <div class="panel" style="width:640px">
+      <div class="head">Kalender – 06.–12. Nov</div>
+      <div class="strip" id="strip"></div>
+    </div>
+    <p class="note" style="width:640px">Punkt wird zur Zahl der Termine. Ein mehrtägiger Termin ist ein durchgehender Balken über seine Tage.</p>
+  </div>
+</div>
+
+<h2>Regeln</h2>
+<ul class="rules">
+  <li><b>Zeitfenster:</b> normal 08–18 Uhr. Gibt es heute früher oder später etwas, wächst das Fenster auf die volle Stunde davor/danach, höchstens 06–22 Uhr. Die Höhe der Stunde schrumpft, damit alles ohne Scrollen passt.</li>
+  <li><b>Länge:</b> ein Termin ist ein Block von Start bis Ende. Mindesthöhe 30 Minuten, damit der Titel lesbar bleibt.</li>
+  <li><b>Gleichzeitig:</b> bis zu zwei Termine stehen nebeneinander. Ab dem dritten steht „+N“.</li>
+  <li><b>Jetzt:</b> eine Linie auf die genaue Minute. Vorbei = gedämpft, läuft gerade = hell mit Rand.</li>
+  <li><b>Ganztägig und mehrtägig:</b> als Balken über der Zeitachse, mit „Tag 2 von 3“.</li>
+  <li><b>Über Mitternacht:</b> der Block endet am Fensterrand, mit „bis morgen 01:00“.</li>
+  <li><b>API:</b> liefert zusätzlich Enddatum und pro Tag einen Eintrag (auch für Tage, an denen ein Termin schon läuft).</li>
+</ul>
+
+<script>
+const NOW = {a:'10:40', b:'20:10', c:'14:00'}
+const days = [
+  {t:'Normaler Tag, 10:40', now:NOW.a, win:[8,18], top:[], ev:[['09:00','09:45','Daily Standup'],['10:30','12:30','Workshop'],['13:00','13:30','Mittag mit Sara'],['15:00','16:30','Zahnarzt']]},
+  {t:'Voller Tag, 20:10 (früh, spät, gleichzeitig)', now:NOW.b, win:[6,22], top:[], ev:[['06:30','07:00','Zug nach Zürich'],['09:00','11:00','Kundentermin'],['10:00','10:30','Call'],['10:15','11:30','Review'],['18:30','20:00','Sport'],['20:30','21:30','Film mit Tom']]},
+  {t:'Mehrtägig, 14:00', now:NOW.c, win:[8,18], top:[['Klassenlager','Tag 2 von 3'],['Feiertag Allerheiligen','ganztägig']], ev:[['11:00','12:00','Elterngespräch'],['16:00','17:00','Einkaufen']]},
+]
+const toMin=s=>+s.slice(0,2)*60+ +s.slice(3)
+const root=document.getElementById('today')
+for(const d of days){
+  const [h0,h1]=d.win, H=340, per=H/((h1-h0)*60), nowM=toMin(d.now)
+  const panel=document.createElement('div'); panel.className='panel'
+  let html=`<div class="head">Heute – Fr 06.11</div>`
+  if(d.top.length) html+=`<div class="top">${d.top.map(([a,b])=>`<div class="bar">${a}<i>${b}</i></div>`).join('')}</div>`
+  html+=`<div class="axis">`
+  for(let h=h0;h<h1;h++) html+=`<div class="hr" style="top:${(h-h0)*60*per}px;height:${60*per}px"><span>${String(h).padStart(2,'0')}:00</span></div>`
+  // Spalten: bis zu zwei nebeneinander, ab dem dritten „+N“
+  const evs=d.ev.map(e=>({s:toMin(e[0]),e:toMin(e[1]),a:e[0],b:e[1],n:e[2]}))
+  const placed=[]
+  for(const e of evs){
+    const clash=placed.filter(p=>p.s<e.e&&e.s<p.e)
+    if(clash.length>=2){ clash[1].more=(clash[1].more||0)+1; continue }
+    e.col=clash.length?1-clash[0].col:0; e.cols=clash.length?2:1
+    if(clash.length){clash[0].cols=2}
+    placed.push(e)
+  }
+  for(const e of placed){
+    const top=(e.s-h0*60)*per, hh=Math.max(30,e.e-e.s)*per-2
+    const w=e.cols===2?'calc(50% - 44px)':'calc(100% - 78px)'
+    const left=e.cols===2?`calc(70px + ${e.col}*(50% - 38px))`:'70px'
+    const cls=e.e<=nowM?'past':(e.s<=nowM?'cur':'')
+    html+=`<div class="ev ${cls}" style="top:${top}px;height:${hh}px;left:${left};width:${w}">${e.n}<small>${e.a}–${e.b}</small></div>`
+    if(e.more) html+=`<div class="more" style="top:${top}px">+${e.more}</div>`
+  }
+  if(nowM>=h0*60&&nowM<=h1*60) html+=`<div class="now" style="top:${(nowM-h0*60)*per}px"></div>`
+  html+=`</div>`
+  panel.innerHTML=html
+  const wrap=document.createElement('div'); wrap.appendChild(panel)
+  wrap.insertAdjacentHTML('beforeend',`<p class="note">${d.t}</p>`)
+  root.appendChild(wrap)
+}
+// Wochenleiste
+const names=['Fr','Sa','So','Mo','Di','Mi','Do'], counts=[4,0,1,3,0,2,1]
+const camp=[1,2,3] // Klassenlager Sa-Mo (Index 1..3 sichtbar ab Sa)
+document.getElementById('strip').innerHTML=names.map((n,i)=>{
+  const inCamp=camp.includes(i)
+  const span=inCamp?`<div class="span${i===camp[0]?' s':''}${i===camp[camp.length-1]?' e':''}"></div>`:''
+  return `<div class="d${i===0?' t':''}">${n}<b>${6+i}</b>${span}<div class="cnt">${counts[i]?counts[i]+(counts[i]>1?' Termine':' Termin'):'–'}</div></div>`
+}).join('')
+</script>
+</body>
+</html>

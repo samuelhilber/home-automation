@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 import ical, { type ParameterValue, type VEvent } from 'node-ical'
-import { addDays, zurichClock } from './time.ts'
+import { addDays, daysInclusive, zurichClock } from './time.ts'
 
 // ADR-028: the api downloads read-only ICS links itself. The links live in a
 // git-ignored file on the Pi (CALENDARS_FILE) and never leave this module: no
@@ -23,9 +23,14 @@ export type CalendarEvent = {
   uid: string // with calendarId the switch target: covers a single event or a whole series
   calendarId: string
   title: string
+  // An event that spans several days has one entry per day. `date` is that day, `start` and `end`
+  // are the part of the event on that day: "00:00" on days after the first and "24:00" on days
+  // before the last.
   date: string // YYYY-MM-DD, Zurich
   start: string | null // HH:MM, null for all-day events
   end: string | null
+  day: number // 1-based position of this entry within the event
+  days: number // how many days the event covers (1 for most)
   allDay: boolean
   series: boolean // true: the switch applies to every occurrence
   shown: boolean // false: switched out of the morning screen
@@ -168,8 +173,9 @@ export class CalendarImporter {
   status(at: Date, days: number): CalendarStatus {
     const today = zurichClock(at).date
     const last = addDays(today, days - 1)
-    // A day of slack on both sides, then filtered by the Zurich date.
-    const from = new Date(at.getTime() - 36 * 3600_000)
+    // Reaches back two weeks so an event that began earlier and still runs today is found, then
+    // filtered by the Zurich date.
+    const from = new Date(at.getTime() - 15 * 24 * 3600_000)
     const to = new Date(at.getTime() + (days + 1) * 24 * 3600_000)
     const events: CalendarEvent[] = []
 
@@ -190,19 +196,30 @@ export class CalendarImporter {
           const allDay = inst.isFullDay
           // All-day events carry a date, not a moment: take it as written, without a zone shift.
           const startClock = allDay ? null : zurichClock(inst.start)
-          const date = allDay ? ymdLocal(inst.start) : startClock!.date
-          if (date < today || date > last) continue
-          events.push({
-            uid: ev.uid,
-            calendarId: info.id,
-            title: text(inst.summary) || '(ohne Titel)',
-            date,
-            start: startClock?.time ?? null,
-            end: allDay ? null : zurichClock(inst.end).time,
-            allDay,
-            series: ev.rrule !== undefined || inst.isRecurring,
-            shown: !this.state.eventsOff.includes(key),
-          })
+          const first = allDay ? ymdLocal(inst.start) : startClock!.date
+          const endClock = allDay ? null : zurichClock(inst.end)
+          // The end of an all-day event is the day after; a timed event that ends at midnight
+          // belongs to the day before. Either way the last day is the one that still has content.
+          let lastDay = allDay ? addDays(ymdLocal(inst.end), -1) : zurichClock(new Date(inst.end.getTime() - 60_000)).date
+          if (lastDay < first) lastDay = first
+          if (lastDay < today || first > last) continue
+          const days = daysInclusive(first, lastDay)
+          for (let date = first, day = 1; date <= lastDay; date = addDays(date, 1), day++) {
+            if (date < today || date > last) continue
+            events.push({
+              uid: ev.uid,
+              calendarId: info.id,
+              title: text(inst.summary) || '(ohne Titel)',
+              date,
+              start: allDay ? null : date === first ? startClock!.time : '00:00',
+              end: allDay ? null : date === lastDay && endClock!.date === date ? endClock!.time : '24:00',
+              day,
+              days,
+              allDay,
+              series: ev.rrule !== undefined || inst.isRecurring,
+              shown: !this.state.eventsOff.includes(key),
+            })
+          }
         }
       }
     }
