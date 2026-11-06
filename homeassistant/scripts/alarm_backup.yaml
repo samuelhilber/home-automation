@@ -1,0 +1,38 @@
+# The single entry point for the Sonos backup alarm (ADR-020). It sets the
+# time and switches the alarm on or off; the evening sync and alarm_ring both
+# go through here, so a change in the Sonos integration is fixed in one place.
+alarm_backup:
+  alias: Alarm backup
+  # Queued so that two calls close together are both applied, in order.
+  mode: queued
+  fields:
+    enabled:
+      description: Switch the backup alarm on (true) or off (false). Defaults to on, the safe side.
+      example: true
+    alarm_time:
+      description: Time of the real alarm; the backup is set to 10 minutes later. Leave out to keep the time.
+      example: "06:30:00"
+  variables:
+    # Found by its internal ID, never by name: Sonos alarms have no names and
+    # the entity name follows the time. This is the only Sonos alarm that may
+    # be changed here; the others are Samuel's real alarms.
+    backup_alarm_id: 980
+    speaker: media_player.kinderzimmer_kinderzimmer
+    minutes_after: 10
+  sequence:
+    - if: "{{ alarm_time is defined }}"
+      then:
+        - action: sonos.update_alarm
+          target:
+            entity_id: "{{ speaker }}"
+          data:
+            alarm_id: "{{ backup_alarm_id }}"
+            enabled: "{{ enabled | default(true) | bool }}"
+            time: "{{ (today_at(alarm_time) + timedelta(minutes=minutes_after)).strftime('%H:%M:%S') }}"
+      else:
+        - action: sonos.update_alarm
+          target:
+            entity_id: "{{ speaker }}"
+          data:
+            alarm_id: "{{ backup_alarm_id }}"
+            enabled: "{{ enabled | default(true) | bool }}"
