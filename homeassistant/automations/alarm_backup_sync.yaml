@@ -1,0 +1,29 @@
+- id: alarm_backup_sync_2100
+  alias: Alarm backup sync 21:00
+  description: Every evening sets the Sonos backup alarm 10 minutes after the next alarm and switches it on; switches it off when tomorrow is no working day (ADR-020).
+  mode: single
+  triggers:
+    - trigger: time
+      at: "21:00:00"
+  actions:
+    # If the check fails the backup is treated as needed: fail-safe means it
+    # rings when in doubt, never stays silent.
+    - action: workday.check_date
+      target:
+        entity_id: binary_sensor.workday_sensor_ch_sg
+      data:
+        check_date: "{{ (now() + timedelta(days=1)).date() }}"
+      response_variable: tomorrow
+      continue_on_error: true
+    - if: >-
+        {{ (tomorrow | default({})).get('binary_sensor.workday_sensor_ch_sg', {}).get('workday', true) }}
+      then:
+        # Must match the time in alarm_weekdays_0630.
+        - action: script.alarm_backup
+          data:
+            enabled: true
+            alarm_time: "06:30:00"
+      else:
+        - action: script.alarm_backup
+          data:
+            enabled: false

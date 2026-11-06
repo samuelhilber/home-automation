@@ -51,3 +51,10 @@ alarm_ring:
     - action: media_player.media_pause
       target:
         entity_id: "{{ zone }}"
+    # The backup is only switched off when the alarm was really stopped. After
+    # the 15-minute timeout it stays on (it has rung by then anyway) (ADR-020).
+    - if: "{{ wait.completed }}"
+      then:
+        - action: script.alarm_backup
+          data:
+            enabled: false
