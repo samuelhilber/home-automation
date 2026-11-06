@@ -2,8 +2,9 @@ import Icon from './Icon'
 import type { PageId } from '../App'
 import './Sidebar.css'
 
-// The morning screen is its own app (apps/tv). Dev default is its dev server; set VITE_TV_URL for the Pi.
-const TV_URL = import.meta.env.VITE_TV_URL ?? 'http://localhost:5176'
+// The morning screen is its own app (apps/tv). In dev it is the vite dev server; in the build the api serves it
+// at /tv/ on the same address as this app (ADR-026), so the link works from the LAN and the tailnet alike.
+const TV_URL = import.meta.env.VITE_TV_URL ?? (import.meta.env.DEV ? 'http://localhost:5176' : '/tv/')
 
 // Items with an `id` switch the page, items with an `href` open in a new tab.
 const NAV_ITEMS: { label: string; icon: string; id?: PageId; href?: string; desktopOnly?: boolean }[] = [
