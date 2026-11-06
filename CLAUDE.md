@@ -64,7 +64,7 @@ home-automation/
 ├── apps/
 │   ├── admin/         Management web app (React)
 │   ├── tv/            Morning screen on the TV (React)
-│   └── api/           Backend (Node + TypeScript, Fastify); alarms through the Home Assistant config API (ADR-025) and read-only status routes (`/api/status/*`) for the admin overview and TV panels
+│   └── api/           Backend (Node + TypeScript, Fastify); alarms through the Home Assistant config API (ADR-025) and read-only status routes (`/api/status/*`) for the admin overview and TV panels; Pi values come from the probe in `tools/pi-probe` (ADR-027)
 ├── homeassistant/     The Home Assistant configuration under version control
 └── prototypes/        UI prototypes (tv-kiosk, admin), signed off by Samuel; still inline-styled HTML, to be rewritten in React before real use
 ```

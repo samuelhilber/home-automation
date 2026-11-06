@@ -31,3 +31,4 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-025](025-alarms-managed-through-home-assistant-config-api.md) | Alarms made in the management web app are stored as Home Assistant automations | Accepted |
 | [ADR-026](026-api-serves-the-apps-from-the-pi.md) | The backend serves the admin app and the TV page from the Raspberry Pi | Accepted |
 | [ADR-099](099-leave-home-detection-comes-last.md) | The leave-home detection is fixed last | Accepted |
+| [ADR-027](027-own-probe-program-for-pi-system-values.md) | Pi system values come from a small probe program of our own | Accepted |

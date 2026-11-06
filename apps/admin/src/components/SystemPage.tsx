@@ -1,7 +1,7 @@
 import Icon from './Icon'
 import { systemPage as s } from '../mockData'
 import { statusApi } from '../api'
-import { clockOf, whenLabel } from '../format'
+import { clockOf, gbLabel, uptimeLabel, whenLabel } from '../format'
 import { useStatus } from '../useStatus'
 import './SystemPage.css'
 
@@ -33,6 +33,9 @@ function Status({ ok, okText, badText }: { ok: boolean; okText: string; badText:
 export default function SystemPage() {
   const { data: backup, loaded: backupLoaded } = useStatus(statusApi.backupAlarm)
   const { data: last, loaded: lastLoaded } = useStatus(statusApi.lastBackup)
+  const { data: sys, loaded: sysLoaded } = useStatus(statusApi.system)
+  const pi = sys?.reading ?? null
+  const dash = sysLoaded ? '–' : 'Lädt …'
   const lastOk = last?.ok !== false
   return (
     <main className="content">
@@ -95,29 +98,38 @@ export default function SystemPage() {
             <span className="label">
               <Icon name="cpu" />
               Raspberry Pi
-              <span className="tag">{s.pi.name}</span>
             </span>
-            <Status ok={s.pi.online} okText="Online" badText="Offline" />
+            {sys && <Status ok={sys.probe} okText="Online" badText="Keine Messwerte" />}
           </div>
           <div className="meters">
-            <Meter label="CPU-Auslastung" value={s.pi.cpuPercent} text={`${s.pi.cpuPercent} %`} />
-            <Meter label="Temperatur" value={s.pi.tempC} text={`${s.pi.tempC} °C`} warn={s.pi.tempC > TEMP_WARN} />
-            <Meter label="Arbeitsspeicher" value={s.pi.memoryPercent} text={`${s.pi.memoryPercent} %`} detail={s.pi.memoryDetail} />
+            <Meter label="CPU-Auslastung" value={pi?.cpuPercent ?? 0} text={pi ? `${pi.cpuPercent} %` : '–'} />
+            <Meter
+              label="Temperatur"
+              value={pi?.tempC ?? 0}
+              text={pi?.tempC != null ? `${Math.round(pi.tempC)} °C` : '–'}
+              warn={(pi?.tempC ?? 0) > TEMP_WARN}
+            />
+            <Meter
+              label="Arbeitsspeicher"
+              value={pi?.memory.percent ?? 0}
+              text={pi ? `${pi.memory.percent} %` : '–'}
+              detail={pi ? `${gbLabel(pi.memory.usedMb / 1000)} von ${gbLabel(Math.round(pi.memory.totalMb / 1000))}` : undefined}
+            />
             <Meter
               label="SSD-Speicher"
-              value={s.pi.diskPercent}
-              text={`${s.pi.diskPercent} %`}
-              detail={s.pi.diskDetail}
-              warn={s.pi.diskPercent > DISK_WARN}
+              value={pi?.disk.percent ?? 0}
+              text={pi ? `${pi.disk.percent} %` : '–'}
+              detail={pi ? `${gbLabel(pi.disk.usedGb)} von ${gbLabel(pi.disk.totalGb)}` : undefined}
+              warn={(pi?.disk.percent ?? 0) > DISK_WARN}
             />
           </div>
           <dl>
             <dt>Laufzeit</dt>
-            <dd>{s.pi.uptime}</dd>
+            <dd>{pi ? uptimeLabel(pi.uptimeSeconds) : dash}</dd>
             <dt>Netzwerk</dt>
-            <dd>{s.pi.network}</dd>
+            <dd>{pi ? (pi.internet.reachable ? `Internet erreichbar (${pi.internet.latencyMs} ms)` : 'Kein Internet') : dash}</dd>
             <dt>Home Assistant</dt>
-            <dd>{s.pi.homeAssistant}</dd>
+            <dd>{sys ? (sys.homeAssistant ? 'antwortet' : 'antwortet nicht') : dash}</dd>
           </dl>
           <div className="hint">
             <Icon name="info" />

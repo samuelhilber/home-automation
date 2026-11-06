@@ -40,6 +40,19 @@ export type BackupAlarm = { found: boolean; on: boolean; time: string | null; mi
 export type TvStatus = { name: string | null; state: string; reachable: boolean; remote: string | null }
 export type LastBackup = { ok: boolean | null; lastSuccess: string | null; lastAttempt: string | null; next: string | null; running: boolean }
 export type Connection = { id: string; state: 'ok' | 'down' | 'none' }
+export type SystemStatus = {
+  probe: boolean // false: the probe on the Pi does not answer, so there is no reading
+  homeAssistant: boolean
+  reading: {
+    cpuPercent: number
+    tempC: number | null
+    memory: { totalMb: number; usedMb: number; percent: number }
+    disk: { totalGb: number; usedGb: number; percent: number }
+    uptimeSeconds: number
+    load1: number
+    internet: { reachable: boolean; latencyMs: number | null }
+  } | null
+}
 
 // Read-only status from Home Assistant (apps/api, /api/status).
 export const statusApi = {
@@ -47,6 +60,7 @@ export const statusApi = {
   backupAlarm: () => request<BackupAlarm>('GET', '/api/status/backup-alarm'),
   tv: () => request<TvStatus>('GET', '/api/status/tv'),
   lastBackup: () => request<LastBackup>('GET', '/api/status/last-backup'),
+  system: () => request<SystemStatus>('GET', '/api/status/system'),
   connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
 }
 

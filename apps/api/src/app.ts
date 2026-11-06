@@ -4,10 +4,11 @@ import { parseAlarmInput, type Alarm } from './alarm.ts'
 import { configIdFor, fromAutomation, toAutomation } from './automation.ts'
 import { HaUnreachableError, type HaClient } from './ha.ts'
 import { SOURCES, ZONES } from './mapping.ts'
+import { NoProbe, type Probe, type SystemStatus } from './probe.ts'
 import * as status from './status.ts'
 
 // `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
-export function buildApp(ha: HaClient, now: () => Date = () => new Date()) {
+export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe: Probe = new NoProbe()) {
   const app = Fastify({ logger: false })
 
   app.setErrorHandler((err, _req, reply) => {
@@ -90,6 +91,18 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date()) {
   app.get('/api/status/player', async () => status.player(await ha.getStates(), now()))
   app.get('/api/status/connections', async () => ({ connections: status.connections(await ha.listConfigEntries()) }))
   app.get('/api/status/last-backup', async () => status.lastBackup(await ha.getStates()))
+  // Pi values come from the probe program on the Pi; Home Assistant only says whether it answers.
+  // Neither being down is an error here: the page shows what is missing.
+  app.get('/api/status/system', async (): Promise<SystemStatus> => {
+    const [reading, homeAssistant] = await Promise.all([
+      probe.read(),
+      ha.getStates().then(
+        () => true,
+        () => false,
+      ),
+    ])
+    return { probe: reading !== null, reading, homeAssistant }
+  })
 
   return app
 }

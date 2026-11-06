@@ -41,3 +41,14 @@ export function whenLabel(iso: string, now = new Date()): string {
         : new Intl.DateTimeFormat('de-DE', { timeZone: ZONE, day: '2-digit', month: '2-digit' }).format(d)
   return `${prefix}, ${time(d)}`
 }
+
+// 80398 -> "22 Std., 19 Min." / 1200000 -> "13 Tage, 21 Std."
+export function uptimeLabel(seconds: number): string {
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds % 86400) / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  if (days > 0) return `${days} ${days === 1 ? 'Tag' : 'Tage'}, ${String(hours).padStart(2, '0')} Std.`
+  return `${hours} Std., ${String(minutes).padStart(2, '0')} Min.`
+}
+
+export const gbLabel = (gb: number) => `${gb.toLocaleString('de-DE', { maximumFractionDigits: 1 })} GB`
