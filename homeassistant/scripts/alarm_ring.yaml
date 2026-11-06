@@ -1,0 +1,33 @@
+# The alarm sound chain (ADR-002, ADR-004, ADR-014). Started by the alarm
+# automations; the Sonos backup alarm on the speaker stays the safety net.
+# The TV is left out on purpose; all TV commands go through one TV script later.
+alarm_ring:
+  alias: Alarm ring
+  mode: single
+  variables:
+    zone: media_player.kinderzimmer_kinderzimmer
+    playlist: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
+    volume: 0.05
+  sequence:
+    - action: media_player.volume_set
+      target:
+        entity_id: "{{ zone }}"
+      data:
+        volume_level: "{{ volume }}"
+    - action: media_player.play_media
+      target:
+        entity_id: "{{ zone }}"
+      data:
+        media_content_type: playlist
+        media_content_id: "{{ playlist }}"
+    # Sonos can report "paused" while the stream starts, which would end the
+    # alarm at once; wait until playback has settled before watching for it.
+    - delay: "00:00:20"
+    # A pause on the speaker counts as the Sonos stop button (ADR-004); without
+    # one, stop after 15 minutes.
+    - wait_template: "{{ is_state(zone, 'paused') }}"
+      timeout: "00:15:00"
+      continue_on_timeout: true
+    - action: media_player.media_pause
+      target:
+        entity_id: "{{ zone }}"
