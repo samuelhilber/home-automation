@@ -180,3 +180,45 @@ describe('routes', () => {
     expect((await a.inject({ method: 'PATCH', url: '/api/calendar/events', payload: { calendarId: 'school' } })).statusCode).toBe(400)
   })
 })
+
+describe('events that span several days', () => {
+  const row = (e: { date: string; start: string | null; end: string | null; day: number; days: number; title: string }) =>
+    `${e.date} ${e.start ?? 'allday'}-${e.end ?? ''} ${e.day}/${e.days} ${e.title}`
+
+  async function statusFor(...events: string[]) {
+    answers[configs[0].url] = ics(...events)
+    answers[configs[1].url] = ics()
+    return (await importer()).status(AT, 7).events.map(row)
+  }
+
+  it('gives a multi-day all-day event one entry per day, the end date being exclusive', async () => {
+    expect(
+      await statusFor(vevent(['UID:camp', 'SUMMARY:Test Camp', 'DTSTART;VALUE=DATE:20261107', 'DTEND;VALUE=DATE:20261110'])),
+    ).toEqual(['2026-11-07 allday- 1/3 Test Camp', '2026-11-08 allday- 2/3 Test Camp', '2026-11-09 allday- 3/3 Test Camp'])
+  })
+
+  it('still shows today the event that began before today', async () => {
+    expect(
+      await statusFor(vevent(['UID:long', 'SUMMARY:Test Trip', 'DTSTART;VALUE=DATE:20261104', 'DTEND;VALUE=DATE:20261108'])),
+    ).toEqual(['2026-11-06 allday- 3/4 Test Trip', '2026-11-07 allday- 4/4 Test Trip'])
+  })
+
+  it('cuts a timed event at midnight and fills the days between', async () => {
+    // Zurich winter time is UTC+1: 21:00Z Fri = 22:00 Fri, 01:00Z Sun = 02:00 Sun
+    expect(
+      await statusFor(vevent(['UID:night', 'SUMMARY:Test Night', 'DTSTART:20261106T210000Z', 'DTEND:20261108T010000Z'])),
+    ).toEqual(['2026-11-06 22:00-24:00 1/3 Test Night', '2026-11-07 00:00-24:00 2/3 Test Night', '2026-11-08 00:00-02:00 3/3 Test Night'])
+  })
+
+  it('does not add a day to an event that ends exactly at midnight', async () => {
+    expect(
+      await statusFor(vevent(['UID:late', 'SUMMARY:Test Late', 'DTSTART:20261106T210000Z', 'DTEND:20261106T230000Z'])),
+    ).toEqual(['2026-11-06 22:00-24:00 1/1 Test Late'])
+  })
+
+  it('keeps a one-day event as one entry', async () => {
+    expect(
+      await statusFor(vevent(['UID:one', 'SUMMARY:Test One', 'DTSTART:20261107T090000Z', 'DTEND:20261107T100000Z'])),
+    ).toEqual(['2026-11-07 10:00-11:00 1/1 Test One'])
+  })
+})

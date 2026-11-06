@@ -26,6 +26,15 @@ export function addDays(date: string, n: number): string {
   return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10)
 }
 
+// Number of calendar days from `a` to `b`, both included ("2026-11-06", "2026-11-06" is 1).
+export function daysInclusive(a: string, b: string): number {
+  const ms = (s: string) => {
+    const [y, m, d] = s.split('-').map(Number)
+    return Date.UTC(y, m - 1, d)
+  }
+  return Math.round((ms(b) - ms(a)) / 86400000) + 1
+}
+
 // 0 = Mo ... 6 = So, like the alarms.
 export function weekdayOf(date: string): number {
   const [y, m, d] = date.split('-').map(Number)

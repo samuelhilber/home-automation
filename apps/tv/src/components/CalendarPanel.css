@@ -24,16 +24,37 @@
   letter-spacing: 0;
   line-height: 1.1;
 }
-.strip .day .mk {
-  width: 4px;
-  height: 4px;
-  background: var(--faint);
-  margin-top: 4px;
+.strip .day {
+  position: relative;
 }
-.strip .day .mk.has {
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
+.strip .day .cnt {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--faint);
+}
+.strip .day .cnt.has {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.strip .day.today .cnt,
+.strip .day.today .cnt.has {
+  color: var(--accent-ink);
+}
+/* a multi-day event: one bar that runs from day to day, over the gap between the cells */
+.strip .day .span {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  bottom: 4px;
+  height: 5px;
+  background: var(--accent-fill);
+}
+.strip .day .span.first {
+  left: 8px;
+}
+.strip .day .span.last {
+  right: 8px;
 }
 .strip .day.today {
   background: var(--accent-fill);
