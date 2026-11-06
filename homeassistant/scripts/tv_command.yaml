@@ -1,0 +1,49 @@
+# The single entry point for all TV commands (CLAUDE.md, ADR-006, ADR-011).
+# Automations call script.tv_command with a command and never touch the TV
+# entity directly, so a broken integration or a new TV entity is fixed here.
+tv_command:
+  alias: TV command
+  description: Runs one TV command. Supported commands are wake and off.
+  # Queued so that two quick commands (e.g. wake, then off) run in order.
+  mode: queued
+  fields:
+    command:
+      name: Command
+      description: What the TV should do.
+      required: true
+      example: wake
+      selector:
+        select:
+          options:
+            # Quoted because an unquoted off is a boolean in YAML.
+            - "wake"
+            - "off"
+  variables:
+    tv: media_player.schlafzimmer_samueltv
+  sequence:
+    - choose:
+        - conditions: "{{ command == 'wake' }}"
+          sequence:
+            # Bravia "Remote start" brings the TV out of standby over the network.
+            - action: media_player.turn_on
+              target:
+                entity_id: "{{ tv }}"
+            # Wait until the TV is up so later steps (e.g. Fully Kiosk) find it
+            # awake. On timeout the script fails and shows up in the trace.
+            - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
+              timeout: "00:00:30"
+              continue_on_timeout: false
+        - conditions: "{{ command == 'off' }}"
+          sequence:
+            # Bravia raises an error when the TV is already off, e.g. because
+            # Samuel switched it off by hand before the 15 minutes ran out.
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state(tv, 'off') }}"
+              then:
+                - action: media_player.turn_off
+                  target:
+                    entity_id: "{{ tv }}"
+      default:
+        - stop: "Unknown TV command: {{ command }}"
+          error: true
