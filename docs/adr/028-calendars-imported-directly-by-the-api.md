@@ -1,6 +1,6 @@
 # ADR-028: Calendars are imported directly by the API, starting with read-only links
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-06
 
 ## Context
@@ -37,7 +37,14 @@ Start with option 1 for all three accounts, because it is the smallest thing tha
 - A leaked link exposes that one calendar until Samuel stops publishing it; the fix is to delete the link in the calendar app and publish a new one.
 - Real event data is never committed; tests use made-up calendars (`CLAUDE.md`, privacy).
 
-## What Samuel has to find out or provide
+## Update 6 Nov 2026 (Samuel)
+
+- **Outlook work:** the option to publish a calendar does not exist in his Outlook on the web (most likely switched off by the administrator), so this account is **not imported** for now. Graph stays an option for later if he wants it.
+- **Outlook school:** he has a subscription link (ICS) from the school; it is imported as described above.
+- **iCloud:** he is checking whether a public-calendar link can be made.
+- Links are added by hand in the file on the Pi for now (question 4); the admin app shows status only. A late school calendar is acceptable (question 3).
+
+## What Samuel had to find out or provide
 
 1. For each of the three accounts: can a read-only link be created (iCloud: share the calendar as a public calendar; Outlook: Settings, Calendar, Shared calendars, Publish a calendar)? For work and school this may be blocked: please try and tell me which accounts work.
 2. The links themselves, put into the git-ignored file on the Pi when it exists (not into chat or Git).
