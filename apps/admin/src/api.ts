@@ -35,6 +35,21 @@ export const alarmsApi = {
   remove: (id: string) => request<void>('DELETE', `/api/alarms/${id}`),
 }
 
+export type NextAlarm = { time: string; date: string; weekday: number; inDays: number; kind: 'weekday' | 'app'; alarmId?: string }
+export type BackupAlarm = { found: boolean; on: boolean; time: string | null; minutesAfter: number; syncEnabled: boolean; lastSync: string | null }
+export type TvStatus = { name: string | null; state: string; reachable: boolean; remote: string | null }
+export type LastBackup = { ok: boolean | null; lastSuccess: string | null; lastAttempt: string | null; next: string | null; running: boolean }
+export type Connection = { id: string; state: 'ok' | 'down' | 'none' }
+
+// Read-only status from Home Assistant (apps/api, /api/status).
+export const statusApi = {
+  nextAlarm: () => request<{ alarm: NextAlarm | null }>('GET', '/api/status/next-alarm').then((r) => r.alarm),
+  backupAlarm: () => request<BackupAlarm>('GET', '/api/status/backup-alarm'),
+  tv: () => request<TvStatus>('GET', '/api/status/tv'),
+  lastBackup: () => request<LastBackup>('GET', '/api/status/last-backup'),
+  connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
+}
+
 // Text for the user; 502 means the api works but Home Assistant does not answer.
 export function describeError(err: unknown): string {
   if (err instanceof ApiError) {

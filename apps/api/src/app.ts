@@ -4,8 +4,10 @@ import { parseAlarmInput, type Alarm } from './alarm.ts'
 import { configIdFor, fromAutomation, toAutomation } from './automation.ts'
 import { HaUnreachableError, type HaClient } from './ha.ts'
 import { SOURCES, ZONES } from './mapping.ts'
+import * as status from './status.ts'
 
-export function buildApp(ha: HaClient) {
+// `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
+export function buildApp(ha: HaClient, now: () => Date = () => new Date()) {
   const app = Fastify({ logger: false })
 
   app.setErrorHandler((err, _req, reply) => {
@@ -76,6 +78,18 @@ export function buildApp(ha: HaClient) {
     await ha.deleteAutomation(configIdFor(req.params.id))
     return reply.code(204).send()
   })
+
+  // Read-only status for the overview (admin) and the morning screen (TV).
+  app.get('/api/status/next-alarm', async () => {
+    const [alarms, states] = await Promise.all([listAlarms(), ha.getStates()])
+    return { alarm: await status.nextAlarm(ha, alarms, states, now()) }
+  })
+  app.get('/api/status/backup-alarm', async () => status.backupAlarm(await ha.getStates()))
+  app.get('/api/status/tv', async () => status.tvStatus(await ha.getStates()))
+  app.get('/api/status/weather', async () => status.weather(ha, await ha.getStates(), now()))
+  app.get('/api/status/player', async () => status.player(await ha.getStates(), now()))
+  app.get('/api/status/connections', async () => ({ connections: status.connections(await ha.listConfigEntries()) }))
+  app.get('/api/status/last-backup', async () => status.lastBackup(await ha.getStates()))
 
   return app
 }

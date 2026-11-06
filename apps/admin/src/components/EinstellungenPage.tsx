@@ -1,9 +1,42 @@
 import { useState } from 'react'
 import Icon from './Icon'
-import { connections, settingsDefaults as d } from '../mockData'
+import { connections as mockConnections, settingsDefaults as d, type Connection } from '../mockData'
+import { statusApi } from '../api'
+import { useStatus } from '../useStatus'
 import './EinstellungenPage.css'
 
+// The lines Home Assistant knows about; their state comes from the api. The buttons stay off until
+// the backend can connect and disconnect accounts.
+const LIVE: Record<string, Pick<Connection, 'name' | 'detail' | 'value'> & { down?: string }> = {
+  spotify: { name: 'Spotify', detail: 'Quelle für die Wecker' },
+  sonos: { name: 'Sonos', value: 'verbunden' },
+  tv: { name: 'Sony-TV (Bravia)', down: 'Nicht erreichbar' },
+  ha: { name: 'Home Assistant', value: 'läuft' },
+}
+// Display order, mixing live and placeholder lines.
+const ORDER = ['icloud', 'work', 'school', 'spotify', 'sonos', 'tv', 'ha', 'tailscale', 'watchdog']
+
+function mergeConnections(live: { id: string; state: Connection['state'] }[] | undefined): Connection[] {
+  const byId = new Map<string, Connection>(mockConnections.map((c) => [c.id, c]))
+  // Until the api answers (or if it cannot), the live lines show as unknown rather than vanish.
+  for (const id of Object.keys(LIVE)) byId.set(id, { id, name: LIVE[id].name, state: 'none', detail: 'Status unbekannt' })
+  for (const l of live ?? []) {
+    const meta = LIVE[l.id]
+    if (!meta) continue
+    byId.set(l.id, {
+      id: l.id,
+      name: meta.name,
+      state: l.state,
+      detail: l.state === 'down' ? (meta.down ?? 'Nicht erreichbar') : l.state === 'none' ? 'Nicht eingerichtet' : meta.detail,
+      value: l.state === 'ok' ? meta.value : undefined,
+    })
+  }
+  return ORDER.flatMap((id) => byId.get(id) ?? [])
+}
+
 export default function EinstellungenPage() {
+  const { data: live } = useStatus(statusApi.connections)
+  const connections = mergeConnections(live)
   const [skipHolidays, setSkipHolidays] = useState(d.skipHolidays)
 
   return (

@@ -1,8 +1,12 @@
 import Icon from './Icon'
-import { tvStatus } from '../mockData'
+import { statusApi } from '../api'
+import { useStatus } from '../useStatus'
 import './TvCallToActionCard.css'
 
+const TV_DETAIL: Record<string, string> = { on: 'Eingeschaltet', off: 'Standby' }
+
 export default function TvCallToActionCard() {
+  const { data: tv, loaded } = useStatus(statusApi.tv)
   return (
     <section className="card cta">
       <div className="cta-copy">
@@ -25,8 +29,8 @@ export default function TvCallToActionCard() {
         </div>
         <div className="tv-line">
           <i />
-          {tvStatus.room} · {tvStatus.connected ? 'verbunden' : 'nicht verbunden'}
-          <small>{tvStatus.detail}</small>
+          {tv?.name ?? 'TV'} · {!loaded ? 'prüft …' : tv?.reachable ? 'verbunden' : 'nicht verbunden'}
+          {tv?.reachable && <small>{TV_DETAIL[tv.state] ?? tv.state}</small>}
         </div>
         <img className="egg" src="/assets/egg-ruffy.png" alt="" />
       </div>

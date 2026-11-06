@@ -1,47 +1,54 @@
 import Icon from './Icon'
-import { forecast, weather as w } from '../mockData'
-import { DAYS, addDays, utcDate, type ZurichNow } from '../lib/time'
+import { statusApi } from '../lib/api'
+import { usePolling } from '../hooks/usePolling'
+import { describeCondition } from '../lib/weather'
+import { DAYS } from '../lib/time'
 import './WeatherPanel.css'
 
-export default function WeatherPanel({ now }: { now: ZurichNow }) {
-  const today = utcDate(now.y, now.m, now.d)
+const FIVE_MINUTES = 5 * 60 * 1000
+const dash = '–'
+
+export default function WeatherPanel() {
+  const data = usePolling(statusApi.weather, FIVE_MINUTES)
+  const w = data?.now
+  const cond = describeCondition(w?.condition ?? null)
 
   return (
     <section className="panel p-weather">
       <div className="head">
-        Wetter &mdash; {w.place} &middot; {w.source}
+        Wetter &mdash; {w?.place ?? 'St. Gallen'} &middot; {w?.source ?? dash}
       </div>
       <div className="now">
         <div className="now-icon">
-          <Icon name={w.icon} />
+          <Icon name={cond.icon} />
         </div>
         <div>
-          <div className="temp tabular">{w.tempC}&deg;C</div>
-          <div className="cond">{w.condition}</div>
+          <div className="temp tabular">{w?.tempC != null ? `${Math.round(w.tempC)}°C` : dash}</div>
+          <div className="cond">{w ? cond.text : dash}</div>
           <div className="meta tabular">
             <div>
-              Wind<b>{w.windKmh} km/h</b>
+              Wind<b>{w?.windKmh != null ? `${w.windKmh} km/h` : dash}</b>
             </div>
             <div>
-              Regen<b>{w.rainPercent} %</b>
+              Regen<b>{w?.rainMm != null ? `${w.rainMm} mm` : dash}</b>
             </div>
             <div>
-              Luftf.<b>{w.humidityPercent} %</b>
+              Luftf.<b>{w?.humidityPercent != null ? `${w.humidityPercent} %` : dash}</b>
             </div>
             <div>
-              Gef&uuml;hlt<b>{w.feelsLikeC} &deg;C</b>
+              Druck<b>{w?.pressureHpa != null ? `${w.pressureHpa} hPa` : dash}</b>
             </div>
           </div>
         </div>
       </div>
       <hr className="rule" />
       <div className="forecast tabular">
-        {forecast.map((f, i) => (
-          <div key={i} className="d">
-            <span>{DAYS[addDays(today, i + 1).getUTCDay()]}</span>
-            <Icon name={f.icon} />
-            <b>{f.hi}&deg;</b>
-            <span className="lo">{f.lo}&deg;</span>
+        {(data?.forecast ?? []).map((f) => (
+          <div key={f.date} className="d">
+            <span>{DAYS[new Date(`${f.date}T00:00:00Z`).getUTCDay()]}</span>
+            <Icon name={describeCondition(f.condition).icon} />
+            <b>{f.hiC ?? dash}&deg;</b>
+            <span className="lo">{f.loC ?? dash}&deg;</span>
           </div>
         ))}
       </div>
