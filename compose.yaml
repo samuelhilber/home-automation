@@ -1,0 +1,26 @@
+# Runs the api with both apps on the Pi, next to Home Assistant (ADR-026).
+# Needs an env file on the Pi that is not in Git (copy apps/api/.env.example):
+# HA_URL, HA_TOKEN and optionally PI_PROBE_URL. Path: ./api.env or $API_ENV_FILE.
+#   docker compose up -d --build
+services:
+  api:
+    build: .
+    container_name: home-api
+    restart: unless-stopped
+    env_file: ${API_ENV_FILE:-api.env}
+    environment:
+      CALENDARS_FILE: /data/calendars/calendars.json
+      CALENDAR_STATE_FILE: /data/state/calendar-state.json
+    ports:
+      # Localhost by default. Set API_BIND to the Pi's LAN address so Fully Kiosk can open
+      # http://<pi>:8787/tv/ . Never publish beyond the LAN and the tailnet: the api has no login.
+      - "${API_BIND:-127.0.0.1}:8787:8787"
+    extra_hosts:
+      # Lets HA_URL point at http://host.docker.internal:8123 when Home Assistant uses the host network.
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # The read-only calendar links, written by hand on the Pi (ADR-028).
+      - ${CALENDARS_DIR:-${HOME}/calendar-data}:/data/calendars:ro
+      - api-state:/data/state
+volumes:
+  api-state:
