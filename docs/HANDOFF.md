@@ -1,11 +1,11 @@
-# Handoff: state of the project (3 Nov 2026)
+# Handoff: state of the project (6 Nov 2026)
 
 Read `CLAUDE.md` first for rules and key decisions. This file covers where things stand and what comes next.
 
 ## Done
 
 - Planning: requirements R1–R19, decisions ADR-001 to ADR-023 (newest PDF in `docs/versions/`; ADR-022 and ADR-023 also mirrored in `docs/adr/`).
-- Hardware bought: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case; on order, not arrived. Storage: SanDisk Extreme Portable SSD 1 TB, already emptied (Home Assistant OS will wipe it anyway).
+- Hardware bought and set up: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case, SanDisk Extreme Portable SSD 1 TB. The Pi runs Raspberry Pi OS with Home Assistant in Docker (ADR-024).
 - Sony TV: storage freed up.
 - Sonos: UPnP is on. The backup alarm exists in the Sonos app at **04:44**, switched **off**. Once Home Assistant runs, find it by that time, label it "Backup" and take it over (ADR-020).
 - UI prototypes for the TV (`prototypes/tv-kiosk/`) and the admin/phone view (`prototypes/admin/`) built and signed off by Samuel. Still inline-styled HTML; need a React rewrite with CSS/JS in their own files before real use (common coding guideline), and the TV hasn't been tested with React yet.
@@ -26,8 +26,8 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 
 ## Next build steps
 
-1. Install Home Assistant OS on the SSD (Raspberry Pi Imager on Samuel's Windows PC), boot the Pi.
-2. Put the configuration under Git in `homeassistant/`, set up Tailscale, nightly backups.
+1. Done: Raspberry Pi OS and Home Assistant in Docker run on the Pi; Tailscale is installed.
+2. Sync the live configuration with Git (today the files in `homeassistant/` are copied by hand), nightly backups.
 3. TV test: Bravia integration with pre-shared key, "Remote start", Fully Kiosk (free version first).
 4. Data sources, alarms, phone UI, as in the build plan (no watch overview, see ADR-023).
 
