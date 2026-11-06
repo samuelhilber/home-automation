@@ -1,0 +1,53 @@
+# The alarm sound chain (ADR-002, ADR-004, ADR-014). Started by the alarm
+# automations; the Sonos backup alarm on the speaker stays the safety net.
+# The TV is woken through script.tv_command, the single entry point for TV commands.
+alarm_ring:
+  alias: Alarm ring
+  mode: single
+  variables:
+    zone: media_player.kinderzimmer_kinderzimmer
+    tv: media_player.schlafzimmer_samueltv
+    playlist: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
+    volume: 0.05
+  sequence:
+    # The TV comes first: the Arc is wired to it and drops a running stream
+    # when the TV wakes up and takes over the audio. script.turn_on does not
+    # wait for the TV script, so a broken TV raises no error here; the timeout
+    # below lets the music start anyway.
+    - action: script.turn_on
+      target:
+        entity_id: script.tv_command
+      data:
+        variables:
+          command: wake
+    # The 15 minutes count from the wake command, not from the stop (ADR-011).
+    - action: script.turn_on
+      target:
+        entity_id: script.tv_morning_timer
+    - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
+      timeout: "00:00:40"
+      continue_on_timeout: true
+    # Give the Arc a moment to switch to the TV input before the stream starts.
+    - delay: "00:00:05"
+    - action: media_player.volume_set
+      target:
+        entity_id: "{{ zone }}"
+      data:
+        volume_level: "{{ volume }}"
+    - action: media_player.play_media
+      target:
+        entity_id: "{{ zone }}"
+      data:
+        media_content_type: playlist
+        media_content_id: "{{ playlist }}"
+    # Sonos can report "paused" while the stream starts, which would end the
+    # alarm at once; wait until playback has settled before watching for it.
+    - delay: "00:00:20"
+    # A pause on the speaker counts as the Sonos stop button (ADR-004); without
+    # one, stop after 15 minutes.
+    - wait_template: "{{ is_state(zone, 'paused') }}"
+      timeout: "00:15:00"
+      continue_on_timeout: true
+    - action: media_player.media_pause
+      target:
+        entity_id: "{{ zone }}"

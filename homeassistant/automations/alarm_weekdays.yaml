@@ -1,0 +1,16 @@
+- id: alarm_weekdays_0630
+  alias: Alarm Mon-Fri 06:30
+  description: Rings the alarm chain on working days, skipping St. Gallen public holidays (ADR-012).
+  mode: single
+  triggers:
+    - trigger: time
+      at: "06:30:00"
+  conditions:
+    # The Workday sensor already excludes weekends and holidays. If it is
+    # unavailable the condition fails and the alarm stays silent, so the Sonos
+    # backup alarm is what wakes Samuel then.
+    - condition: state
+      entity_id: binary_sensor.workday_sensor_ch_sg
+      state: "on"
+  actions:
+    - action: script.alarm_ring

@@ -1,0 +1,18 @@
+# Switches the TV off 15 minutes after the alarm woke it, or as soon as
+# Samuel leaves home, whichever comes first (ADR-011). Started by alarm_ring,
+# so the TV is only timed after an alarm, never when Samuel watches something
+# later.
+tv_morning_timer:
+  alias: TV morning timer
+  # Restart so that a second alarm run starts the 15 minutes again.
+  mode: restart
+  sequence:
+    - wait_for_trigger:
+        - trigger: state
+          entity_id: person.homeassistantclanker
+          from: "home"
+      timeout: "00:15:00"
+      continue_on_timeout: true
+    - action: script.tv_command
+      data:
+        command: "off"
