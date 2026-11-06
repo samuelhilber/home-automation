@@ -1,0 +1,47 @@
+import type { Alarm } from './mockData'
+
+// Talks to apps/api. In dev, vite forwards /api to it (see vite.config.ts).
+export class ApiError extends Error {
+  status: number
+  constructor(status: number, message: string) {
+    super(message)
+    this.status = status
+  }
+}
+
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  let res: Response
+  try {
+    res = await fetch(path, {
+      method,
+      headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    })
+  } catch {
+    throw new ApiError(0, 'api_unreachable')
+  }
+  if (!res.ok) {
+    const error = await res.json().then((j: { error?: string }) => j.error).catch(() => undefined)
+    throw new ApiError(res.status, error ?? 'request_failed')
+  }
+  return res.status === 204 ? (undefined as T) : ((await res.json()) as T)
+}
+
+export const alarmsApi = {
+  list: () => request<Alarm[]>('GET', '/api/alarms'),
+  create: (alarm: Omit<Alarm, 'id'>) => request<Alarm>('POST', '/api/alarms', alarm),
+  update: (alarm: Alarm) => request<Alarm>('PUT', `/api/alarms/${alarm.id}`, alarm),
+  setOn: (id: string, on: boolean) => request<Alarm>('PATCH', `/api/alarms/${id}`, { on }),
+  remove: (id: string) => request<void>('DELETE', `/api/alarms/${id}`),
+}
+
+// Text for the user; 502 means the api works but Home Assistant does not answer.
+export function describeError(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 502) return 'Home Assistant antwortet nicht. Der Pi ist vermutlich nicht erreichbar.'
+    if (err.status === 0) return 'Die Verwaltung (API) ist nicht erreichbar.'
+    if (err.status === 404) return 'Dieser Wecker existiert nicht mehr. Seite neu laden.'
+    if (err.status === 400) return `Eingabe nicht gültig: ${err.message}`
+  }
+  return 'Das hat nicht geklappt. Bitte nochmal versuchen.'
+}

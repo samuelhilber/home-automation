@@ -28,3 +28,4 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-022](022-tv-loads-pages-from-the-pi.md) | The TV loads its pages from the Raspberry Pi in the long term | Accepted |
 | [ADR-023](023-no-watch-overview.md) | The watch overview is left out | Accepted |
 | [ADR-024](024-raspberry-pi-os-and-docker.md) | Raspberry Pi OS with Home Assistant in Docker replaces Home Assistant OS | Accepted |
+| [ADR-025](025-alarms-managed-through-home-assistant-config-api.md) | Alarms made in the management web app are stored as Home Assistant automations | Accepted |

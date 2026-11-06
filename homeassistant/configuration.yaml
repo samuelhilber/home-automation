@@ -12,5 +12,8 @@ homeassistant:
 
 default_config:
 
-automation: !include_dir_merge_list automations/
+# Two labels so both sources load: hand-written files in automations/ and the
+# alarms the management web app saves through the config API (ADR-025).
+automation manual: !include_dir_merge_list automations/
+automation ui: !include automations.yaml
 script: !include_dir_merge_named scripts/

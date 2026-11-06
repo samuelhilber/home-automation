@@ -4,31 +4,49 @@
 alarm_ring:
   alias: Alarm ring
   mode: single
+  fields:
+    # All four are optional. The defaults are the fixed values of the first
+    # alarm, so a call without fields rings exactly as before. The alarms made
+    # in the management web app pass them (ADR-025).
+    zone_entity:
+      description: Sonos player or group that plays the alarm.
+      example: media_player.kinderzimmer_kinderzimmer
+    playlist_uri:
+      description: Spotify playlist that is played.
+      example: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
+    volume_level:
+      description: Volume from 0 to 1.
+      example: 0.05
+    wake_tv:
+      description: Wake the TV before the music starts.
+      example: true
   variables:
-    zone: media_player.kinderzimmer_kinderzimmer
+    zone: "{{ zone_entity | default('media_player.kinderzimmer_kinderzimmer') }}"
     tv: media_player.schlafzimmer_samueltv
-    playlist: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
-    volume: 0.05
+    playlist: "{{ playlist_uri | default('spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8') }}"
+    volume: "{{ volume_level | default(0.05) | float(0.05) }}"
   sequence:
-    # The TV comes first: the Arc is wired to it and drops a running stream
-    # when the TV wakes up and takes over the audio. script.turn_on does not
-    # wait for the TV script, so a broken TV raises no error here; the timeout
-    # below lets the music start anyway.
-    - action: script.turn_on
-      target:
-        entity_id: script.tv_command
-      data:
-        variables:
-          command: wake
-    # The 15 minutes count from the wake command, not from the stop (ADR-011).
-    - action: script.turn_on
-      target:
-        entity_id: script.tv_morning_timer
-    - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
-      timeout: "00:00:40"
-      continue_on_timeout: true
-    # Give the Arc a moment to switch to the TV input before the stream starts.
-    - delay: "00:00:05"
+    - if: "{{ wake_tv | default(true) | bool(true) }}"
+      then:
+        # The TV comes first: the Arc is wired to it and drops a running stream
+        # when the TV wakes up and takes over the audio. script.turn_on does not
+        # wait for the TV script, so a broken TV raises no error here; the timeout
+        # below lets the music start anyway.
+        - action: script.turn_on
+          target:
+            entity_id: script.tv_command
+          data:
+            variables:
+              command: wake
+        # The 15 minutes count from the wake command, not from the stop (ADR-011).
+        - action: script.turn_on
+          target:
+            entity_id: script.tv_morning_timer
+        - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
+          timeout: "00:00:40"
+          continue_on_timeout: true
+        # Give the Arc a moment to switch to the TV input before the stream starts.
+        - delay: "00:00:05"
     - action: media_player.volume_set
       target:
         entity_id: "{{ zone }}"
