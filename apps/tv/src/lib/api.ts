@@ -1,3 +1,5 @@
+import { demoEvents, isDemo } from './demo'
+
 // Read-only status from apps/api. In dev, vite forwards /api to it (see vite.config.ts).
 export type Weather = {
   now: {
@@ -47,5 +49,6 @@ async function get<T>(path: string): Promise<T> {
 export const statusApi = {
   weather: () => get<Weather>('/api/status/weather'),
   player: () => get<Player>('/api/status/player'),
-  calendar: () => get<CalendarStatus>('/api/status/calendar?days=7'),
+  // /tv/?demo shows made-up events instead of the real calendar (lib/demo.ts).
+  calendar: () => (isDemo() ? Promise.resolve<CalendarStatus>({ events: demoEvents() }) : get<CalendarStatus>('/api/status/calendar?days=7')),
 }
