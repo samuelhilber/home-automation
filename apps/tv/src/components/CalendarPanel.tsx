@@ -1,4 +1,5 @@
 import type { CalendarEvent } from '../lib/api'
+import { asset } from '../lib/asset'
 import { DAYS, addDays, dm, pad, utcDate, type ZurichNow } from '../lib/time'
 import './CalendarPanel.css'
 
@@ -36,7 +37,7 @@ export default function CalendarPanel({ now, events }: { now: ZurichNow; events:
           Termin
         </span>
       </div>
-      <img className="egg" src="/assets/egg-ichigo.png" alt="" />
+      <img className="egg" src={asset('egg-ichigo.png')} alt="" />
     </section>
   )
 }

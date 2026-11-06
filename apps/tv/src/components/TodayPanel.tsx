@@ -1,4 +1,5 @@
 import type { CalendarEvent } from '../lib/api'
+import { asset } from '../lib/asset'
 import { DAYS_TC, dm, pad, utcDate, type ZurichNow } from '../lib/time'
 import './TodayPanel.css'
 
@@ -33,7 +34,7 @@ export default function TodayPanel({ now, events }: { now: ZurichNow; events: Ca
           )
         })}
       </div>
-      <img className="egg" src="/assets/egg-ichigo.png" alt="" />
+      <img className="egg" src={asset('egg-ichigo.png')} alt="" />
     </section>
   )
 }

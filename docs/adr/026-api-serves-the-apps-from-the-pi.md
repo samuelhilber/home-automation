@@ -34,3 +34,9 @@ Option 1. A multi-stage Dockerfile builds both apps and the backend into one ima
 - The TV page needs the Pi's LAN address; it is not written into the repo (privacy rule), it lives in Fully Kiosk's settings on the TV.
 - Building the image on the Pi 5 (arm64) works but is slow; building it on the laptop with `docker buildx` for arm64 and copying it over is an option for later.
 - Not decided here: the exact Dockerfile and compose file (a separate pull request once this is accepted), whether the container starts on boot (yes, `restart: unless-stopped`), and where the watchdog check-in comes from (ADR-021).
+
+## Update 6 Nov 2026 (implementation)
+
+- `Dockerfile` (repo root) builds both apps and runs the api with Node's type stripping; `compose.yaml` runs it as `home-api` with `restart: unless-stopped`. Checked by building and starting the image on the Pi (arm64) in a throw-away container; nothing was deployed.
+- The api serves `admin/` at `/` and `tv/` at `/tv/` when `WEB_ROOT` is set (`@fastify/static`). The TV build uses base `/tv/`, so its picture files go through `BASE_URL`; dev is unchanged.
+- The env file with `HA_URL` and `HA_TOKEN` stays on the Pi (`api.env`, or `API_ENV_FILE`). The port binds to localhost unless `API_BIND` names the Pi's LAN address. The calendar links folder (`~/calendar-data`, read-only) and a volume for the switches are mounted for ADR-028.
