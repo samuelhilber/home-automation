@@ -1,6 +1,7 @@
 import { buildApp } from './app.ts'
 import { CalendarImporter, httpFetcher, loadConfigs } from './calendar.ts'
 import { HttpHaClient } from './ha.ts'
+import { SettingsStore } from './settings.ts'
 import { serveApps } from './web.ts'
 import { HttpProbe, NoProbe } from './probe.ts'
 
@@ -19,7 +20,10 @@ const calendar = new CalendarImporter(loadConfigs(process.env.CALENDARS_FILE), h
 void calendar.refresh()
 setInterval(() => void calendar.refresh(), 15 * 60 * 1000).unref()
 
-const app = buildApp(new HttpHaClient(url, token), () => new Date(), probeUrl ? new HttpProbe(probeUrl) : new NoProbe(), calendar)
+// Settings (ADR-029): only the default volume lives here, in SETTINGS_FILE (a Docker volume).
+const settings = new SettingsStore(process.env.SETTINGS_FILE)
+
+const app = buildApp(new HttpHaClient(url, token), () => new Date(), probeUrl ? new HttpProbe(probeUrl) : new NoProbe(), calendar, settings)
 // In the container the built apps are served too (ADR-026); in dev vite does that.
 if (process.env.WEB_ROOT) await serveApps(app, process.env.WEB_ROOT)
 // Localhost by default; reach it from the phone through Tailscale (ADR-008).

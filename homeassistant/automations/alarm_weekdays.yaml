@@ -8,9 +8,19 @@
   conditions:
     # The Workday sensor already excludes weekends and holidays. If it is
     # unavailable the condition fails and the alarm stays silent, so the Sonos
-    # backup alarm is what wakes Samuel then.
-    - condition: state
-      entity_id: binary_sensor.workday_sensor_ch_sg
-      state: "on"
+    # backup alarm is what wakes Samuel then. The second branch is the
+    # "Ring on public holidays" setting (ADR-029): still Mon-Fri only.
+    - condition: or
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.workday_sensor_ch_sg
+          state: "on"
+        - condition: and
+          conditions:
+            - condition: state
+              entity_id: input_boolean.ring_on_holidays
+              state: "on"
+            - condition: time
+              weekday: [mon, tue, wed, thu, fri]
   actions:
     - action: script.alarm_ring

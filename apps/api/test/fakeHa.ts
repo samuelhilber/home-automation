@@ -46,6 +46,20 @@ export class FakeHa implements HaClient {
     this.check()
     return this.entries
   }
+  calls: { domain: string; service: string; data: Record<string, unknown> }[] = []
+  async callService(domain: string, service: string, data: Record<string, unknown>) {
+    this.check()
+    this.calls.push({ domain, service, data })
+    // Mimic the helpers so a read after a write shows the new value.
+    const id = String(data.entity_id)
+    const set = (s: string) => {
+      this.states = this.states.filter((x) => x.entity_id !== id).concat(state(id, s))
+    }
+    if (service === 'turn_on') set('on')
+    else if (service === 'turn_off') set('off')
+    else if (service === 'set_value') set(String(data.value))
+    else if (service === 'set_datetime') set(String(data.time))
+  }
   async isWorkday(date: string) {
     this.check()
     return !this.holidays.has(date)

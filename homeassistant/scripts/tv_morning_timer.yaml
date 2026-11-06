@@ -11,7 +11,10 @@ tv_morning_timer:
         - trigger: state
           entity_id: person.homeassistantclanker
           from: "home"
-      timeout: "00:15:00"
+      # "Morning screen at most" in the management web app (ADR-029); 15 when
+      # the helper is missing or unavailable.
+      timeout:
+        minutes: "{{ states('input_number.morning_screen_max_minutes') | int(15) }}"
       continue_on_timeout: true
     - action: script.tv_command
       data:

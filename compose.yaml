@@ -16,6 +16,7 @@ services:
       WEB_ROOT: /srv/web
       CALENDARS_FILE: /data/calendars/calendars.json
       CALENDAR_STATE_FILE: /data/state/calendar-state.json
+      SETTINGS_FILE: /data/state/settings.json
     ports:
       # Localhost by default. Set API_BIND to the Pi's LAN address so Fully Kiosk can open
       # http://<pi>:8787/tv/ . Never publish beyond the LAN and the tailnet: the api has no login.

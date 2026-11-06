@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon'
-import { connections as mockConnections, settingsDefaults as d, type Connection } from '../mockData'
-import { statusApi } from '../api'
+import { connections as mockConnections, type Connection } from '../mockData'
+import { describeError, settingsApi, statusApi, type Settings } from '../api'
 import { useStatus } from '../useStatus'
 import './EinstellungenPage.css'
 
@@ -37,7 +37,22 @@ function mergeConnections(live: { id: string; state: Connection['state'] }[] | u
 export default function EinstellungenPage() {
   const { data: live } = useStatus(statusApi.connections)
   const connections = mergeConnections(live)
-  const [skipHolidays, setSkipHolidays] = useState(d.skipHolidays)
+  const { data: liveSettings } = useStatus(settingsApi.get)
+  // The answer to our own change, shown until the next refresh brings the same values.
+  const [saved, setSaved] = useState<{ base: Settings | undefined; value: Settings } | undefined>()
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const s = saved && saved.base === liveSettings ? saved.value : liveSettings
+  const dash = '–' // Home Assistant does not answer or the helper is missing
+
+  async function toggleHolidays() {
+    if (s?.skipHolidays == null) return
+    setSaveError(null)
+    try {
+      setSaved({ base: liveSettings, value: await settingsApi.update({ skipHolidays: !s.skipHolidays }) })
+    } catch (err) {
+      setSaveError(describeError(err))
+    }
+  }
 
   return (
     <main className="content">
@@ -84,9 +99,14 @@ export default function EinstellungenPage() {
           <div className="card-head">
             <span className="label">Standardwerte</span>
           </div>
+          {saveError && (
+            <p className="set-desc" role="alert">
+              {saveError}
+            </p>
+          )}
           <div className="set-line">
             <span>Zeitzone</span>
-            <span className="val">{d.timeZone}</span>
+            <span className="val">{s?.timeZone ?? 'Europe/Zurich'}</span>
           </div>
           <div className="set-line">
             <span>Feiertage St. Gallen überspringen</span>
@@ -94,23 +114,24 @@ export default function EinstellungenPage() {
               type="button"
               className="switch"
               role="switch"
-              aria-checked={skipHolidays}
+              aria-checked={s?.skipHolidays ?? false}
               aria-label="Feiertage St. Gallen überspringen"
-              onClick={() => setSkipHolidays((v) => !v)}
+              disabled={s?.skipHolidays == null}
+              onClick={toggleHolidays}
             >
               <i />
             </button>
           </div>
           <div className="set-line">
             <span>Standard-Lautstärke für neue Wecker</span>
-            <span className="val">{d.defaultVolume}</span>
+            <span className="val">{s?.defaultVolume ?? dash}</span>
           </div>
           <div className="set-line">
             <span>
               Morgenbildschirm höchstens
               <small>Weniger, wenn du das Haus verlässt</small>
             </span>
-            <span className="val">{d.morningScreenMaxMinutes} Min.</span>
+            <span className="val">{s?.morningScreenMaxMinutes == null ? dash : `${s.morningScreenMaxMinutes} Min.`}</span>
           </div>
         </section>
 
@@ -123,14 +144,14 @@ export default function EinstellungenPage() {
               Tägliche Meldung über wartende Updates
               <small>aufs Handy</small>
             </span>
-            <span className="val">{d.updateNotice}</span>
+            <span className="val">{s?.updateNotice ?? dash}</span>
           </div>
           <div className="set-line">
             <span>
               Sperrzeit für Installationen <span className="tag">nur lesen</span>
               <small>Ab 21:00 bis 2 Std. nach dem letzten Wecker</small>
             </span>
-            <span className="val">{d.installWindow}</span>
+            <span className="val">{s ? `${s.installWindow.from}–${s.installWindow.to}` : dash}</span>
           </div>
         </section>
       </div>

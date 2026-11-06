@@ -12,6 +12,29 @@ homeassistant:
 
 default_config:
 
+# Settings that automations read and the management web app changes (ADR-029).
+# No `initial:` on purpose: it would reset the value at every restart and undo
+# what Samuel set in the app. Home Assistant restores the last value instead.
+input_boolean:
+  # Inverted on purpose: a fresh helper is "off", and off must mean the old
+  # behaviour (public holidays are skipped, ADR-012).
+  ring_on_holidays:
+    name: Ring on public holidays
+    icon: mdi:calendar-star
+input_number:
+  morning_screen_max_minutes:
+    name: Morning screen at most (minutes)
+    min: 1
+    max: 60
+    step: 1
+    mode: box
+    unit_of_measurement: min
+input_datetime:
+  update_notice_time:
+    name: Daily update notice
+    has_date: false
+    has_time: true
+
 # Two labels so both sources load: hand-written files in automations/ and the
 # alarms the management web app saves through the config API (ADR-025).
 automation manual: !include_dir_merge_list automations/

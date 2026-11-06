@@ -38,15 +38,6 @@ export const connections: Connection[] = [
   { id: 'watchdog', name: 'Watchdog-Dienst', state: 'ok', detail: 'Externer Dienst', value: 'erreicht' },
 ]
 
-export const settingsDefaults = {
-  timeZone: 'Europe/Zurich',
-  skipHolidays: true,
-  defaultVolume: 5,
-  morningScreenMaxMinutes: 15,
-  updateNotice: '21:00',
-  installWindow: '21:00–08:30',
-}
-
 // Updates (made-up versions).
 export type UpdateItem = { id: string; name: string; from: string; to: string; notesUrl: string }
 export type UpdateHistoryItem = { id: string; name: string; from: string; to: string; ok: boolean; date: string }

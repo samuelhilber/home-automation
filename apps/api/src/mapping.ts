@@ -41,6 +41,10 @@ export const ENTITIES = {
   backupLastAttempt: 'sensor.backup_last_attempted_automatic_backup',
   backupNext: 'sensor.backup_next_scheduled_automatic_backup',
   backupState: 'sensor.backup_backup_manager_state',
+  // Settings helpers declared in homeassistant/configuration.yaml (ADR-029).
+  ringOnHolidays: 'input_boolean.ring_on_holidays',
+  morningScreenMax: 'input_number.morning_screen_max_minutes',
+  updateNotice: 'input_datetime.update_notice_time',
 }
 
 export const PLACE = 'St. Gallen'
