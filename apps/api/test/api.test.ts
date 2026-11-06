@@ -1,31 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { buildApp } from '../src/app.ts'
-import type { AutomationConfig } from '../src/automation.ts'
-import { HaUnreachableError, type HaAutomation, type HaClient } from '../src/ha.ts'
-
-class FakeHa implements HaClient {
-  store = new Map<string, HaAutomation>()
-  down = false
-  private check() {
-    if (this.down) throw new HaUnreachableError('down')
-  }
-  async listAppAutomations() {
-    this.check()
-    return [...this.store.values()]
-  }
-  async saveAutomation(configId: string, config: AutomationConfig) {
-    this.check()
-    this.store.set(configId, { configId, config, on: this.store.get(configId)?.on ?? true })
-  }
-  async deleteAutomation(configId: string) {
-    this.check()
-    this.store.delete(configId)
-  }
-  async setAutomationEnabled(configId: string, on: boolean) {
-    this.check()
-    this.store.get(configId)!.on = on
-  }
-}
+import { FakeHa } from './fakeHa.ts'
 
 const body = {
   time: '06:30',

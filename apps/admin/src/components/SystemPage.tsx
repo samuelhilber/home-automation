@@ -1,5 +1,8 @@
 import Icon from './Icon'
 import { systemPage as s } from '../mockData'
+import { statusApi } from '../api'
+import { clockOf, whenLabel } from '../format'
+import { useStatus } from '../useStatus'
 import './SystemPage.css'
 
 const TEMP_WARN = 70
@@ -28,6 +31,9 @@ function Status({ ok, okText, badText }: { ok: boolean; okText: string; badText:
 }
 
 export default function SystemPage() {
+  const { data: backup, loaded: backupLoaded } = useStatus(statusApi.backupAlarm)
+  const { data: last, loaded: lastLoaded } = useStatus(statusApi.lastBackup)
+  const lastOk = last?.ok !== false
   return (
     <main className="content">
       <div className="title-row">
@@ -46,16 +52,16 @@ export default function SystemPage() {
               Backup-Wecker
               <span className="tag">nur lesen</span>
             </span>
-            <Status ok={s.backupAlarm.on} okText="Eingeschaltet" badText="Ausgeschaltet" />
+            {backup && <Status ok={backup.on} okText="Eingeschaltet" badText="Ausgeschaltet" />}
           </div>
-          <div className="big tabular">{s.backupAlarm.time}</div>
+          <div className="big tabular">{backup?.time ?? '–'}</div>
           <dl>
-            <dt>Zone</dt>
-            <dd>{s.backupAlarm.zone}</dd>
             <dt>Abstand</dt>
-            <dd>{s.backupAlarm.offset}</dd>
+            <dd>{backup ? `${backup.minutesAfter} Min. nach Hauptwecker` : backupLoaded ? 'nicht gefunden' : 'Lädt …'}</dd>
+            <dt>Abgleich 21:00</dt>
+            <dd>{backup ? (backup.syncEnabled ? 'eingeschaltet' : 'ausgeschaltet') : '–'}</dd>
             <dt>Letzter Abgleich</dt>
-            <dd>{s.backupAlarm.lastSync}</dd>
+            <dd>{backup?.lastSync ? whenLabel(backup.lastSync) : '–'}</dd>
           </dl>
           <div className="hint">
             <Icon name="info" />
@@ -119,20 +125,26 @@ export default function SystemPage() {
           </div>
         </section>
 
-        <section className={`card wide${s.lastBackup.ok ? '' : ' card-bad'}`}>
+        <section className={`card wide${lastOk ? '' : ' card-bad'}`}>
           <div className="card-head">
             <span className="label">
               <Icon name="list" />
               Letztes nächtliches Backup
             </span>
-            <Status ok={s.lastBackup.ok} okText="Erfolgreich" badText="Fehlgeschlagen" />
+            {last && (last.ok === null ? <span className="tag">Noch keins</span> : <Status ok={last.ok} okText="Erfolgreich" badText="Fehlgeschlagen" />)}
           </div>
-          <div className="big tabular">{s.lastBackup.time}</div>
+          <div className="big tabular">{last?.lastSuccess ? clockOf(last.lastSuccess) : '–'}</div>
           <dl>
-            <dt>Zeitpunkt</dt>
-            <dd>{s.lastBackup.when}</dd>
+            <dt>Letztes erfolgreiches</dt>
+            <dd>{last?.lastSuccess ? whenLabel(last.lastSuccess) : lastLoaded ? 'noch keins' : 'Lädt …'}</dd>
             <dt>Ergebnis</dt>
-            <dd>{s.lastBackup.ok ? 'Erfolgreich' : s.lastBackup.error}</dd>
+            <dd>
+              {last?.ok === true && 'Erfolgreich'}
+              {last?.ok === false && 'Der letzte Versuch ist fehlgeschlagen'}
+              {last?.ok === null && 'Noch kein automatisches Backup gelaufen'}
+            </dd>
+            <dt>Nächstes</dt>
+            <dd>{last?.next ? whenLabel(last.next) : '–'}</dd>
           </dl>
           <div className="hint">
             <Icon name="info" />
