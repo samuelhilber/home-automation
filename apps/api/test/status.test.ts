@@ -190,3 +190,32 @@ it('answers 502 for every status route when Home Assistant is down', async () =>
     expect((await app().inject({ method: 'GET', url: '/api/status/' + route })).statusCode).toBe(502)
   }
 })
+
+describe('system', () => {
+  const reading = {
+    cpuPercent: 14,
+    tempC: 42.1,
+    memory: { totalMb: 8062, usedMb: 1117, percent: 14 },
+    disk: { totalGb: 984.1, usedGb: 11.7, percent: 1 },
+    uptimeSeconds: 80398,
+    load1: 0.01,
+    internet: { reachable: true, latencyMs: 9 },
+  }
+  const withProbe = (r: typeof reading | null) =>
+    buildApp(ha, () => at, { read: async () => r })
+  const system = async (a: ReturnType<typeof buildApp>) => (await a.inject({ method: 'GET', url: '/api/status/system' })).json()
+
+  it('passes the probe reading on and says Home Assistant answers', async () => {
+    expect(await system(withProbe(reading))).toEqual({ probe: true, reading, homeAssistant: true })
+  })
+
+  it('still answers when the probe is missing or silent', async () => {
+    expect(await system(withProbe(null))).toEqual({ probe: false, reading: null, homeAssistant: true })
+    expect(await system(app())).toMatchObject({ probe: false, reading: null })
+  })
+
+  it('still answers when Home Assistant is down', async () => {
+    ha.down = true
+    expect(await system(withProbe(reading))).toMatchObject({ probe: true, homeAssistant: false })
+  })
+})

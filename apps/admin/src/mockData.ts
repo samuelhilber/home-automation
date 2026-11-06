@@ -1,14 +1,9 @@
-// Placeholder values for what the backend cannot deliver yet (calendars, Pi system values, watchdog,
+// Placeholder values for what the backend cannot deliver yet (calendars, watchdog,
 // activity feed, settings, updates). Next alarm, backup alarm, TV, last backup and the Home Assistant
 // connections come from apps/api (see api.ts, statusApi).
 
 export const systemStatus = {
-  checkedSecondsAgo: 12,
-  pi: { online: true, uptime: 'Laufzeit 12 Tage, 08 Std.' },
   watchdog: { ok: true, lastSignal: 'Letztes Signal um 20:46:48' },
-  cpuTemp: 42,
-  memoryPercent: 38,
-  network: 'stabil',
 }
 
 export const activityFeed = [
@@ -21,19 +16,6 @@ export const activityFeed = [
 // System page (placeholder values, matching the signed-off sketch).
 export const systemPage = {
   watchdog: { ok: true, lastCheckIn: '20:46', agoSeconds: 12, externalReached: true },
-  pi: {
-    name: 'morgenpi',
-    online: true,
-    cpuPercent: 14,
-    tempC: 42,
-    memoryPercent: 38,
-    memoryDetail: '3,0 von 8 GB',
-    diskPercent: 21,
-    diskDetail: '50 von 240 GB',
-    uptime: '12 Tage, 08 Std.',
-    network: 'stabil',
-    homeAssistant: 'läuft (Docker)',
-  },
 }
 
 // Kalender-Import page (made-up data, no real calendar content).
