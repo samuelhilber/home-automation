@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto'
 import Fastify from 'fastify'
 import { parseAlarmInput, type Alarm } from './alarm.ts'
+import { CalendarImporter, httpFetcher } from './calendar.ts'
 import { configIdFor, fromAutomation, toAutomation } from './automation.ts'
 import { HaUnreachableError, type HaClient } from './ha.ts'
 import { SOURCES, ZONES } from './mapping.ts'
@@ -8,7 +9,9 @@ import { NoProbe, type Probe, type SystemStatus } from './probe.ts'
 import * as status from './status.ts'
 
 // `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
-export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe: Probe = new NoProbe()) {
+export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe: Probe = new NoProbe(),
+  calendar: CalendarImporter = new CalendarImporter([], httpFetcher, undefined),
+) {
   const app = Fastify({ logger: false })
 
   app.setErrorHandler((err, _req, reply) => {
@@ -102,6 +105,28 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe
       ),
     ])
     return { probe: reading !== null, reading, homeAssistant }
+  })
+
+  // Calendars (ADR-028). Reading is open to the TV and the admin app; the links never appear here.
+  app.get<{ Querystring: { days?: string } }>('/api/status/calendar', async (req) => {
+    const days = Math.min(14, Math.max(1, Math.floor(Number(req.query.days ?? 7)) || 7))
+    return calendar.status(now(), days)
+  })
+  app.patch<{ Params: { id: string }; Body: { on?: unknown } }>('/api/calendar/calendars/:id', async (req, reply) => {
+    if (typeof req.body?.on !== 'boolean') return reply.code(400).send({ error: 'on must be true or false' })
+    if (!calendar.hasCalendar(req.params.id)) return reply.code(404).send({ error: 'not_found' })
+    calendar.setCalendarOn(req.params.id, req.body.on)
+    return calendar.calendars().find((c) => c.id === req.params.id)
+  })
+  // One switch per calendar id + UID, so it covers a single event or a whole series.
+  app.patch<{ Body: { calendarId?: unknown; uid?: unknown; shown?: unknown } }>('/api/calendar/events', async (req, reply) => {
+    const { calendarId, uid, shown } = req.body ?? {}
+    if (typeof calendarId !== 'string' || typeof uid !== 'string' || uid === '' || typeof shown !== 'boolean') {
+      return reply.code(400).send({ error: 'calendarId, uid and shown are required' })
+    }
+    if (!calendar.hasCalendar(calendarId)) return reply.code(404).send({ error: 'not_found' })
+    calendar.setEventShown(`${calendarId}:${uid}`, shown)
+    return reply.code(204).send()
   })
 
   return app

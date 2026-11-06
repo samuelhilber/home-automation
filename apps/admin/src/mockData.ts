@@ -18,61 +18,6 @@ export const systemPage = {
   watchdog: { ok: true, lastCheckIn: '20:46', agoSeconds: 12, externalReached: true },
 }
 
-// Kalender-Import page (made-up data, no real calendar content).
-export type CalendarSource = {
-  id: string
-  name: string
-  signedIn: boolean
-  calendars: { id: string; name: string; on: boolean }[]
-}
-
-export const calendarSources: CalendarSource[] = [
-  {
-    id: 'icloud',
-    name: 'iCloud',
-    signedIn: true,
-    calendars: [
-      { id: 'ic-privat', name: 'Privat', on: true },
-      { id: 'ic-familie', name: 'Familie', on: true },
-    ],
-  },
-  {
-    id: 'work',
-    name: 'Outlook Arbeit',
-    signedIn: true,
-    calendars: [
-      { id: 'ow-kalender', name: 'Kalender', on: true },
-      { id: 'ow-meetings', name: 'Besprechungen', on: false },
-    ],
-  },
-  {
-    id: 'school',
-    name: 'Outlook Schule',
-    signedIn: false,
-    calendars: [{ id: 'os-plan', name: 'Stundenplan', on: true }],
-  },
-]
-
-export type CalendarEvent = {
-  id: string
-  day: 'Heute' | 'Morgen'
-  time: string
-  title: string
-  calendarId: string
-  sourceLabel: string
-  seriesId?: string
-  preview: boolean
-}
-
-export const initialEvents: CalendarEvent[] = [
-  { id: 'e1', day: 'Heute', time: '09:00–09:30', title: 'Team-Standup', calendarId: 'ow-kalender', sourceLabel: 'Outlook Arbeit', seriesId: 's-standup', preview: true },
-  { id: 'e2', day: 'Heute', time: '12:30–13:30', title: 'Mittagessen mit Anna', calendarId: 'ic-privat', sourceLabel: 'iCloud · Privat', preview: true },
-  { id: 'e3', day: 'Heute', time: '16:00–17:00', title: 'Projektrunde', calendarId: 'ow-meetings', sourceLabel: 'Outlook Arbeit · Besprechungen', preview: true },
-  { id: 'e4', day: 'Morgen', time: '08:15–09:00', title: 'Mathe', calendarId: 'os-plan', sourceLabel: 'Outlook Schule', seriesId: 's-mathe', preview: true },
-  { id: 'e5', day: 'Morgen', time: '09:00–09:30', title: 'Team-Standup', calendarId: 'ow-kalender', sourceLabel: 'Outlook Arbeit', seriesId: 's-standup', preview: true },
-  { id: 'e6', day: 'Morgen', time: '14:00–15:00', title: 'Zahnarzt', calendarId: 'ic-privat', sourceLabel: 'iCloud · Privat', preview: false },
-]
-
 // Einstellungen page: status only, never addresses, keys or passwords.
 export type ConnectionState = 'ok' | 'down' | 'none'
 export type Connection = {

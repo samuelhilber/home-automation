@@ -1,10 +1,11 @@
-import { eventDayOffsets } from '../mockData'
+import type { CalendarEvent } from '../lib/api'
 import { DAYS, addDays, dm, pad, utcDate, type ZurichNow } from '../lib/time'
 import './CalendarPanel.css'
 
-export default function CalendarPanel({ now }: { now: ZurichNow }) {
+export default function CalendarPanel({ now, events }: { now: ZurichNow; events: CalendarEvent[] | null }) {
   const today = utcDate(now.y, now.m, now.d)
   const end = addDays(today, 6)
+  const withEvents = new Set((events ?? []).map((e) => e.date))
 
   return (
     <section className="panel p-calendar">
@@ -22,7 +23,7 @@ export default function CalendarPanel({ now }: { now: ZurichNow }) {
               {i === 0 ? (
                 <span className="tag">HEUTE</span>
               ) : (
-                <span className={`mk${eventDayOffsets.includes(i) ? ' has' : ''}`} />
+                <span className={`mk${withEvents.has(dt.toISOString().slice(0, 10)) ? ' has' : ''}`} />
               )}
             </div>
           )
@@ -32,11 +33,7 @@ export default function CalendarPanel({ now }: { now: ZurichNow }) {
       <div className="legend">
         <span>
           <i />
-          Termin (Demo)
-        </span>
-        <span>
-          <i className="grey" />
-          Wichtig
+          Termin
         </span>
       </div>
       <img className="egg" src="/assets/egg-ichigo.png" alt="" />

@@ -23,6 +23,19 @@ export type Player = {
   positionSec: number | null
 }
 
+export type CalendarEvent = {
+  uid: string
+  calendarId: string
+  title: string
+  date: string // YYYY-MM-DD, Zurich
+  start: string | null // HH:MM, null for all-day events
+  end: string | null
+  allDay: boolean
+  series: boolean
+  shown: boolean
+}
+export type CalendarStatus = { events: CalendarEvent[] }
+
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(path)
   if (!res.ok) throw new Error(`${path} answered ${res.status}`)
@@ -32,4 +45,5 @@ async function get<T>(path: string): Promise<T> {
 export const statusApi = {
   weather: () => get<Weather>('/api/status/weather'),
   player: () => get<Player>('/api/status/player'),
+  calendar: () => get<CalendarStatus>('/api/status/calendar?days=7'),
 }
