@@ -59,3 +59,16 @@
   color: var(--text);
   border: 2px solid var(--accent-fill);
 }
+.bar-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.allday {
+  margin-top: 12px;
+  padding: 6px 16px;
+  font-size: 15px;
+  font-weight: 700;
+  border: 2px solid var(--accent-fill);
+  color: var(--text);
+}

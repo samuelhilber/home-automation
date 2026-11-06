@@ -54,6 +54,29 @@ export type SystemStatus = {
   } | null
 }
 
+export type CalendarInfo = { id: string; source: string; name: string; on: boolean; ok: boolean; lastSuccess: string | null }
+export type CalendarEvent = {
+  uid: string
+  calendarId: string
+  title: string
+  date: string // YYYY-MM-DD, Zurich
+  start: string | null
+  end: string | null
+  allDay: boolean
+  series: boolean
+  shown: boolean
+}
+export type CalendarStatus = { calendars: CalendarInfo[]; events: CalendarEvent[] }
+
+// Calendars imported by the api (ADR-028). The api never returns a link.
+export const calendarApi = {
+  status: (days = 2) => request<CalendarStatus>('GET', `/api/status/calendar?days=${days}`),
+  setCalendarOn: (id: string, on: boolean) => request<CalendarInfo>('PATCH', `/api/calendar/calendars/${encodeURIComponent(id)}`, { on }),
+  // Applies to a single event or to every occurrence of a series (same UID).
+  setEventShown: (calendarId: string, uid: string, shown: boolean) =>
+    request<void>('PATCH', '/api/calendar/events', { calendarId, uid, shown }),
+}
+
 // Read-only status from Home Assistant (apps/api, /api/status).
 export const statusApi = {
   nextAlarm: () => request<{ alarm: NextAlarm | null }>('GET', '/api/status/next-alarm').then((r) => r.alarm),

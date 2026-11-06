@@ -50,3 +50,11 @@ Start with option 1 for all three accounts, because it is the smallest thing tha
 2. The links themselves, put into the git-ignored file on the Pi when it exists (not into chat or Git).
 3. Whether an event that is a few hours late on the TV is acceptable for the work calendar, or whether live data is a must (which would mean Graph and an administrator's consent).
 4. Whether entering links through the admin app matters to him, or editing a file on the Pi is fine for now.
+
+## Update 6 Nov 2026 (implementation)
+
+- Library: `node-ical` (maintained, expands recurrence rules, EXDATE and overrides, maps Windows time zone names). Times are converted to Zurich; all-day events keep their date.
+- Files, set by environment variables of the api: `CALENDARS_FILE` (the links, git-ignored, mounted from the Pi) and `CALENDAR_STATE_FILE` (the switches, in a Docker volume). Format of the links file: `{"calendars":[{"id":"school","source":"Outlook Schule","name":"Stundenplan","url":"https://..."}]}`; `id` is letters, digits, `-` or `_`.
+- The state file holds only calendar ids that are off and `calendarId:UID` keys of switched-out events. One key covers a single event and every occurrence of a series, so new occurrences of a switched-out series stay out.
+- Routes: `GET /api/status/calendar?days=7` (calendars without links, events of the next days), `PATCH /api/calendar/calendars/:id` (`{on}`), `PATCH /api/calendar/events` (`{calendarId, uid, shown}`).
+- Download errors are logged without detail, because an error text can contain the link. A multi-day event shows on its first day only.
