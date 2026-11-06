@@ -1,0 +1,13 @@
+# Switches the TV off 15 minutes after the alarm woke it (ADR-011). Started by
+# alarm_ring, so the TV is only timed after an alarm, never when Samuel
+# watches something later. Leaving home as the earlier end is not built yet:
+# it needs the Home Assistant app on the iPhone as a device tracker.
+tv_morning_timer:
+  alias: TV morning timer
+  # Restart so that a second alarm run starts the 15 minutes again.
+  mode: restart
+  sequence:
+    - delay: "00:15:00"
+    - action: script.tv_command
+      data:
+        command: "off"
