@@ -20,6 +20,9 @@ tv_command:
             - "off"
   variables:
     tv: media_player.schlafzimmer_samueltv
+    # Fully Kiosk Browser integration (default names, adjust after setup).
+    kiosk_foreground: button.fully_kiosk_browser_bring_to_foreground
+    kiosk_start_page: button.fully_kiosk_browser_load_start_url
   sequence:
     - choose:
         - conditions: "{{ command == 'wake' }}"
@@ -33,6 +36,29 @@ tv_command:
             - wait_template: "{{ not is_state(tv, ['off', 'unavailable', 'unknown']) }}"
               timeout: "00:00:30"
               continue_on_timeout: false
+            # Bring Fully Kiosk to the front and reload its start page (ADR-006,
+            # ADR-022). Needs Fully Kiosk Plus (Remote Admin) and the "Fully Kiosk
+            # Browser" integration; the button names below are the integration's
+            # defaults and may differ, check them under Settings -> Devices.
+            # Skipped while the buttons do not exist, so the wake still works
+            # before the integration is set up. The app may not answer right after
+            # the wake, so it is tried for up to a minute; a failure only shows in
+            # the trace and never stops the alarm.
+            - repeat:
+                sequence:
+                  - if:
+                      - condition: template
+                        value_template: "{{ states(kiosk_foreground) not in ['unknown', 'unavailable'] }}"
+                    then:
+                      - action: button.press
+                        target:
+                          entity_id:
+                            - "{{ kiosk_foreground }}"
+                            - "{{ kiosk_start_page }}"
+                        continue_on_error: true
+                      - stop: "Fully Kiosk is in front"
+                  - delay: "00:00:05"
+                until: "{{ repeat.index >= 12 }}"
         - conditions: "{{ command == 'off' }}"
           sequence:
             # Bravia raises an error when the TV is already off, e.g. because

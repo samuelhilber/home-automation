@@ -32,4 +32,5 @@ One file per decision. The project documentation is the source of truth; if a fi
 | [ADR-026](026-api-serves-the-apps-from-the-pi.md) | The backend serves the admin app and the TV page from the Raspberry Pi | Accepted |
 | [ADR-027](027-own-probe-program-for-pi-system-values.md) | Pi system values come from a small probe program of our own | Accepted |
 | [ADR-028](028-calendars-imported-directly-by-the-api.md) | Calendars are imported directly by the API, starting with read-only links | Accepted |
+| [ADR-031](031-fully-kiosk-brought-to-front-by-home-assistant.md) | Home Assistant brings Fully Kiosk to the front after the TV wakes | Proposed |
 | [ADR-099](099-leave-home-detection-comes-last.md) | The leave-home detection is fixed last | Accepted |
