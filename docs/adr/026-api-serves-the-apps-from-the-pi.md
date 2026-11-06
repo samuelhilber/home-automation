@@ -1,6 +1,6 @@
 # ADR-026: The backend serves the admin app and the TV page from the Raspberry Pi
 
-- Status: **Proposed** (for Samuel to decide)
+- Status: Accepted
 - Date: 2026-11-06
 
 ## Context
