@@ -35,9 +35,15 @@ tv_command:
               continue_on_timeout: false
         - conditions: "{{ command == 'off' }}"
           sequence:
-            - action: media_player.turn_off
-              target:
-                entity_id: "{{ tv }}"
+            # Bravia raises an error when the TV is already off, e.g. because
+            # Samuel switched it off by hand before the 15 minutes ran out.
+            - if:
+                - condition: template
+                  value_template: "{{ not is_state(tv, 'off') }}"
+              then:
+                - action: media_player.turn_off
+                  target:
+                    entity_id: "{{ tv }}"
       default:
         - stop: "Unknown TV command: {{ command }}"
           error: true
