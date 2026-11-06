@@ -13,4 +13,6 @@ One Sonos alarm is created in the Sonos app and used as the backup. Sonos alarms
 
 ## Consequences
 
+The backup alarm repeats "Daily" in the Sonos app (Samuel's choice on 6 Nov 2026; Home Assistant cannot change the repeat setting). If Home Assistant is down for days, it keeps ringing every day at its last time instead of once. Home Assistant switches it off on days without a working alarm.
+
 Fail-safe: the backup is on by default and only a working Home Assistant can switch it off. Only this one alarm is changed, once a day, because changing several at once is unreliable. Never match it by name and never create a second one.

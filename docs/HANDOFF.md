@@ -7,7 +7,7 @@ Read `CLAUDE.md` first for rules and key decisions. This file covers where thing
 - Planning: requirements R1–R19, decisions ADR-001 to ADR-023 (newest PDF in `docs/versions/`; ADR-022 and ADR-023 also mirrored in `docs/adr/`).
 - Hardware bought and set up: Raspberry Pi 5 8 GB, official 27 W power supply, Flirc passive case, SanDisk Extreme Portable SSD 1 TB. The Pi runs Raspberry Pi OS with Home Assistant in Docker (ADR-024).
 - Sony TV: storage freed up.
-- Sonos: UPnP is on. The backup alarm exists in the Sonos app (created at 04:44, recurrence "Once"). Home Assistant takes it over by its internal ID 980 (`switch.sonos_alarm_980`) through `script.alarm_backup`; the nightly sync is `alarm_backup_sync.yaml` (ADR-020).
+- Sonos: UPnP is on. The backup alarm exists in the Sonos app (created at 04:44, repeat set to "Daily"). Home Assistant takes it over by its internal ID 980 (`switch.sonos_alarm_980`) through `script.alarm_backup`; the nightly sync is `alarm_backup_sync.yaml` (ADR-020).
 - UI prototypes for the TV (`prototypes/tv-kiosk/`) and the admin/phone view (`prototypes/admin/`) built and signed off by Samuel. Still inline-styled HTML; need a React rewrite with CSS/JS in their own files before real use (common coding guideline), and the TV hasn't been tested with React yet.
 - `homeassistant/` configuration skeleton (folders, minimal `configuration.yaml`, `secrets.yaml.example`) added under version control.
 
