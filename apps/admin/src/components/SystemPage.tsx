@@ -1,8 +1,8 @@
 import Icon from './Icon'
-import { systemPage as s } from '../mockData'
 import { statusApi } from '../api'
 import { clockOf, gbLabel, uptimeLabel, whenLabel } from '../format'
 import { useStatus } from '../useStatus'
+import { watchdogView } from '../watchdogView'
 import './SystemPage.css'
 
 const TEMP_WARN = 70
@@ -34,6 +34,8 @@ export default function SystemPage() {
   const { data: backup, loaded: backupLoaded } = useStatus(statusApi.backupAlarm)
   const { data: last, loaded: lastLoaded } = useStatus(statusApi.lastBackup)
   const { data: sys, loaded: sysLoaded } = useStatus(statusApi.system)
+  const { data: watchdog, loaded: dogLoaded } = useStatus(statusApi.watchdog)
+  const dog = watchdogView(watchdog, dogLoaded)
   const pi = sys?.reading ?? null
   const dash = sysLoaded ? '–' : 'Lädt …'
   const lastOk = last?.ok !== false
@@ -78,14 +80,14 @@ export default function SystemPage() {
               <Icon name="activity" />
               Watchdog
             </span>
-            <Status ok={s.watchdog.ok} okText="OK" badText="Keine Meldung" />
+            {dogLoaded && <Status ok={dog.ok} okText="OK" badText={dog.text} />}
           </div>
-          <div className="big tabular">{s.watchdog.lastCheckIn}</div>
+          <div className="big tabular">{dog.clock}</div>
           <dl>
             <dt>Letzte Meldung</dt>
-            <dd>vor {s.watchdog.agoSeconds} Sek.</dd>
+            <dd>{dog.ago}</dd>
             <dt>Externer Dienst</dt>
-            <dd>{s.watchdog.externalReached ? 'erreicht' : 'nicht erreicht'}</dd>
+            <dd>{dog.service}</dd>
           </dl>
           <div className="hint">
             <Icon name="info" />

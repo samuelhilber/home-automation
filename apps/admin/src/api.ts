@@ -54,6 +54,14 @@ export type SystemStatus = {
   } | null
 }
 
+// Watchdog at Healthchecks.io (ADR-032). `reached` false: the service did not answer, never read that as OK.
+export type WatchdogStatus = {
+  configured: boolean
+  reached: boolean
+  state: 'new' | 'up' | 'grace' | 'down' | 'paused' | null
+  lastPing: string | null // ISO time of the last check-in
+}
+
 export type CalendarInfo = { id: string; source: string; name: string; on: boolean; ok: boolean; lastSuccess: string | null }
 export type CalendarEvent = {
   uid: string
@@ -86,6 +94,7 @@ export const statusApi = {
   tv: () => request<TvStatus>('GET', '/api/status/tv'),
   lastBackup: () => request<LastBackup>('GET', '/api/status/last-backup'),
   system: () => request<SystemStatus>('GET', '/api/status/system'),
+  watchdog: () => request<WatchdogStatus>('GET', '/api/status/watchdog'),
   connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
 }
 

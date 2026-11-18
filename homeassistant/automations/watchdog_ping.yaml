@@ -1,0 +1,12 @@
+- id: watchdog_ping
+  alias: Watchdog ping
+  description: Every 5 minutes tells Healthchecks.io that Home Assistant is alive. The service warns the phone when this stops (ADR-021, ADR-032).
+  mode: single
+  triggers:
+    - trigger: time_pattern
+      minutes: "/5"
+  actions:
+    # A failed ping (no internet, service down) must never disturb anything else; the
+    # next one follows in 5 minutes and the grace time covers short gaps.
+    - action: rest_command.watchdog_ping
+      continue_on_error: true

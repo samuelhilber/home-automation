@@ -33,6 +33,9 @@
   font-weight: 700;
   color: var(--accent);
 }
+.tile .state.bad {
+  color: #ff8a8a;
+}
 .tile .state i {
   width: 7px;
   height: 7px;

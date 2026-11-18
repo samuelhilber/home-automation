@@ -8,11 +8,13 @@ import { SOURCES, ZONES } from './mapping.ts'
 import { NoProbe, type Probe, type SystemStatus } from './probe.ts'
 import { applySettings, parseSettingsPatch, readSettings, SettingsStore } from './settings.ts'
 import * as status from './status.ts'
+import { NoWatchdog, type Watchdog } from './watchdog.ts'
 
 // `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
 export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe: Probe = new NoProbe(),
   calendar: CalendarImporter = new CalendarImporter([], httpFetcher, undefined),
   settings: SettingsStore = new SettingsStore(undefined),
+  watchdog: Watchdog = new NoWatchdog(),
 ) {
   const app = Fastify({ logger: false })
 
@@ -108,6 +110,10 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe
     ])
     return { probe: reading !== null, reading, homeAssistant }
   })
+
+  // Watchdog (ADR-032): when the last check-in reached Healthchecks.io. Always answers, so the
+  // page can say "unknown" instead of failing.
+  app.get('/api/status/watchdog', async () => watchdog.read())
 
   // Settings (ADR-029): Home Assistant helpers plus the default volume kept here.
   const loadSettings = async () => {

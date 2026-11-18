@@ -1,12 +1,14 @@
 import Icon from './Icon'
-import { systemStatus } from '../mockData'
 import { statusApi } from '../api'
 import { uptimeLabel } from '../format'
 import { useStatus } from '../useStatus'
+import { watchdogView } from '../watchdogView'
 import './SystemStatusCard.css'
 
 export default function SystemStatusCard() {
   const { data: sys, loaded } = useStatus(statusApi.system)
+  const { data: watchdog, loaded: dogLoaded } = useStatus(statusApi.watchdog)
+  const dog = watchdogView(watchdog, dogLoaded)
   const pi = sys?.reading ?? null
   // The Pi counts as online when its probe answers; if only Home Assistant answers it is online without values.
   const online = sys ? sys.probe || sys.homeAssistant : false
@@ -31,17 +33,16 @@ export default function SystemStatusCard() {
           </div>
           <div className="detail tabular">{pi ? `Laufzeit ${uptimeLabel(pi.uptimeSeconds)}` : '–'}</div>
         </div>
-        {/* Watchdog has no data source yet (ADR-021): still the placeholder. */}
         <div className="tile">
           <div className="name">
             <Icon name="shield" />
             Watchdog
           </div>
-          <div className="state">
+          <div className={`state${dog.ok || !dogLoaded ? '' : ' bad'}`}>
             <i />
-            {systemStatus.watchdog.ok ? 'In Ordnung' : 'Fehler'}
+            {dog.text}
           </div>
-          <div className="detail tabular">{systemStatus.watchdog.lastSignal}</div>
+          <div className="detail tabular">{dog.clock === '–' ? '–' : `Letztes Signal um ${dog.clock}, ${dog.ago}`}</div>
         </div>
       </div>
       <div className="sys-foot tabular">

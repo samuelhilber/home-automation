@@ -4,6 +4,7 @@ import { HttpHaClient } from './ha.ts'
 import { SettingsStore } from './settings.ts'
 import { serveApps } from './web.ts'
 import { HttpProbe, NoProbe } from './probe.ts'
+import { HealthchecksWatchdog, NoWatchdog } from './watchdog.ts'
 
 const url = process.env.HA_URL
 const token = process.env.HA_TOKEN
@@ -23,7 +24,11 @@ setInterval(() => void calendar.refresh(), 15 * 60 * 1000).unref()
 // Settings (ADR-029): only the default volume lives here, in SETTINGS_FILE (a Docker volume).
 const settings = new SettingsStore(process.env.SETTINGS_FILE)
 
-const app = buildApp(new HttpHaClient(url, token), () => new Date(), probeUrl ? new HttpProbe(probeUrl) : new NoProbe(), calendar, settings)
+// Watchdog (ADR-032): read-only Healthchecks.io key; without it the page shows "not set up".
+const watchdogKey = process.env.HEALTHCHECKS_API_KEY
+const watchdog = watchdogKey ? new HealthchecksWatchdog(watchdogKey, process.env.HEALTHCHECKS_CHECK_NAME || undefined) : new NoWatchdog()
+
+const app = buildApp(new HttpHaClient(url, token), () => new Date(), probeUrl ? new HttpProbe(probeUrl) : new NoProbe(), calendar, settings, watchdog)
 // In the container the built apps are served too (ADR-026); in dev vite does that.
 if (process.env.WEB_ROOT) await serveApps(app, process.env.WEB_ROOT)
 // Localhost by default; reach it from the phone through Tailscale (ADR-008).
