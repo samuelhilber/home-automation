@@ -1,10 +1,6 @@
-// Placeholder values for what the backend cannot deliver yet (calendars, watchdog,
-// activity feed, settings, updates). Next alarm, backup alarm, TV, last backup and the Home Assistant
-// connections come from apps/api (see api.ts, statusApi).
-
-export const systemStatus = {
-  watchdog: { ok: true, lastSignal: 'Letztes Signal um 20:46:48' },
-}
+// Placeholder values for what the backend cannot deliver yet (calendar connection rows,
+// activity feed, updates). Next alarm, backup alarm, TV, last backup, the watchdog and the Home
+// Assistant connections come from apps/api (see api.ts, statusApi).
 
 export const activityFeed = [
   { time: '20:46', title: 'Watchdog geprüft', detail: 'Alle Dienste antworten.' },
@@ -13,11 +9,6 @@ export const activityFeed = [
 ]
 
 // Wecker page. Weekdays are 0 = Mo ... 6 = So.
-// System page (placeholder values, matching the signed-off sketch).
-export const systemPage = {
-  watchdog: { ok: true, lastCheckIn: '20:46', agoSeconds: 12, externalReached: true },
-}
-
 // Einstellungen page: status only, never addresses, keys or passwords.
 export type ConnectionState = 'ok' | 'down' | 'none'
 export type Connection = {
@@ -35,7 +26,6 @@ export const connections: Connection[] = [
   { id: 'work', name: 'Outlook Arbeit', state: 'ok', action: 'Trennen' },
   { id: 'school', name: 'Outlook Schule', state: 'none', detail: 'Nicht angemeldet', action: 'Verbinden' },
   { id: 'tailscale', name: 'Tailscale', state: 'ok', detail: 'Zugriff von unterwegs', value: 'aktiv' },
-  { id: 'watchdog', name: 'Watchdog-Dienst', state: 'ok', detail: 'Externer Dienst', value: 'erreicht' },
 ]
 
 // Updates (made-up versions).

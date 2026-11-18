@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Icon from './Icon'
 import { connections as mockConnections, type Connection } from '../mockData'
-import { describeError, settingsApi, statusApi, type Settings } from '../api'
+import { describeError, settingsApi, statusApi, type Settings, type WatchdogStatus } from '../api'
 import { useStatus } from '../useStatus'
 import './EinstellungenPage.css'
 
@@ -16,8 +16,22 @@ const LIVE: Record<string, Pick<Connection, 'name' | 'detail' | 'value'> & { dow
 // Display order, mixing live and placeholder lines.
 const ORDER = ['icloud', 'work', 'school', 'spotify', 'sonos', 'tv', 'ha', 'tailscale', 'watchdog']
 
-function mergeConnections(live: { id: string; state: Connection['state'] }[] | undefined): Connection[] {
+// The watchdog line comes from Healthchecks.io (ADR-032). Only a check that answers and is up counts as fine.
+function watchdogLine(w: WatchdogStatus | undefined): Connection {
+  const base = { id: 'watchdog', name: 'Watchdog-Dienst' }
+  if (!w) return { ...base, state: 'none', detail: 'Status unbekannt' }
+  if (!w.configured) return { ...base, state: 'none', detail: 'Nicht eingerichtet' }
+  if (!w.reached) return { ...base, state: 'down', detail: 'Externer Dienst nicht erreichbar' }
+  if (w.state !== 'up') return { ...base, state: 'down', detail: 'Externer Dienst', value: 'keine Meldung' }
+  return { ...base, state: 'ok', detail: 'Externer Dienst', value: 'erreicht' }
+}
+
+function mergeConnections(
+  live: { id: string; state: Connection['state'] }[] | undefined,
+  watchdog: WatchdogStatus | undefined,
+): Connection[] {
   const byId = new Map<string, Connection>(mockConnections.map((c) => [c.id, c]))
+  byId.set('watchdog', watchdogLine(watchdog))
   // Until the api answers (or if it cannot), the live lines show as unknown rather than vanish.
   for (const id of Object.keys(LIVE)) byId.set(id, { id, name: LIVE[id].name, state: 'none', detail: 'Status unbekannt' })
   for (const l of live ?? []) {
@@ -36,7 +50,8 @@ function mergeConnections(live: { id: string; state: Connection['state'] }[] | u
 
 export default function EinstellungenPage() {
   const { data: live } = useStatus(statusApi.connections)
-  const connections = mergeConnections(live)
+  const { data: watchdog } = useStatus(statusApi.watchdog)
+  const connections = mergeConnections(live, watchdog)
   const { data: liveSettings } = useStatus(settingsApi.get)
   // The answer to our own change, shown until the next refresh brings the same values.
   const [saved, setSaved] = useState<{ base: Settings | undefined; value: Settings } | undefined>()

@@ -42,6 +42,16 @@ export function whenLabel(iso: string, now = new Date()): string {
   return `${prefix}, ${time(d)}`
 }
 
+// "vor 12 Sek." / "vor 4 Min." / "vor 2 Std." / "vor 3 Tagen"
+export function agoLabel(iso: string, now = new Date()): string {
+  const s = Math.max(0, Math.round((now.getTime() - new Date(iso).getTime()) / 1000))
+  if (s < 60) return `vor ${s} Sek.`
+  if (s < 3600) return `vor ${Math.floor(s / 60)} Min.`
+  if (s < 86400) return `vor ${Math.floor(s / 3600)} Std.`
+  const days = Math.floor(s / 86400)
+  return `vor ${days} ${days === 1 ? 'Tag' : 'Tagen'}`
+}
+
 // 80398 -> "22 Std., 19 Min." / 1200000 -> "13 Tage, 21 Std."
 export function uptimeLabel(seconds: number): string {
   const days = Math.floor(seconds / 86400)
