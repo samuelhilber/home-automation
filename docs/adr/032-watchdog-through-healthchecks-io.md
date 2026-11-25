@@ -1,6 +1,6 @@
 # ADR-032: The watchdog is Healthchecks.io, pinged by Home Assistant
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-18
 
 ## Context
