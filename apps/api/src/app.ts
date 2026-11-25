@@ -6,8 +6,9 @@ import { configIdFor, fromAutomation, toAutomation } from './automation.ts'
 import { HaUnreachableError, type HaClient } from './ha.ts'
 import { SOURCES, ZONES } from './mapping.ts'
 import { NoProbe, type Probe, type SystemStatus } from './probe.ts'
-import { applySettings, parseSettingsPatch, readSettings, SettingsStore } from './settings.ts'
+import { applySettings, installBlockedUntil, parseSettingsPatch, readSettings, SettingsStore } from './settings.ts'
 import * as status from './status.ts'
+import { pendingUpdates } from './updates.ts'
 import { NoWatchdog, type Watchdog } from './watchdog.ts'
 
 // `now` can be swapped in tests, so "next alarm" does not depend on the real clock.
@@ -126,6 +127,29 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe
     if (!parsed.ok) return reply.code(400).send({ error: parsed.error })
     await applySettings(ha, settings, parsed.value)
     return loadSettings()
+  })
+
+  // Updates (ADR-018, ADR-019): Home Assistant's own update entities; Samuel confirms each install.
+  // `blockedUntil` is set inside the night window, when nothing may be installed.
+  app.get('/api/status/updates', async () => {
+    const [states, alarms] = await Promise.all([ha.getStates(), listAlarms()])
+    return { updates: pendingUpdates(states), blockedUntil: installBlockedUntil(alarms, states, now()) }
+  })
+  app.post<{ Params: { id: string } }>('/api/updates/:id/install', async (req, reply) => {
+    const [states, alarms] = await Promise.all([ha.getStates(), listAlarms()])
+    const update = pendingUpdates(states).find((u) => u.id === req.params.id)
+    if (!update) return reply.code(404).send({ error: 'not_found' })
+    if (update.inProgress) return reply.code(409).send({ error: 'already_running' })
+    const until = installBlockedUntil(alarms, states, now())
+    if (until) return reply.code(409).send({ error: 'install_window', until })
+    try {
+      await ha.callService('update', 'install', { entity_id: update.id })
+    } catch (err) {
+      // Installing Home Assistant itself restarts it, so the call may never get an answer.
+      // Home Assistant answered a moment ago, so this counts as started.
+      if (!(err instanceof HaUnreachableError)) throw err
+    }
+    return reply.code(202).send({ started: true })
   })
 
   // Calendars (ADR-028). Reading is open to the TV and the admin app; the links never appear here.
