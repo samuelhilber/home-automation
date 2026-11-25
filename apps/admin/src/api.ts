@@ -87,6 +87,8 @@ export const calendarApi = {
     request<void>('PATCH', '/api/calendar/events', { calendarId, uid, shown }),
 }
 
+export type ActivityEntry = { date: string; time: string; title: string; detail: string }
+
 // Read-only status from Home Assistant (apps/api, /api/status).
 export const statusApi = {
   nextAlarm: () => request<{ alarm: NextAlarm | null }>('GET', '/api/status/next-alarm').then((r) => r.alarm),
@@ -95,6 +97,7 @@ export const statusApi = {
   lastBackup: () => request<LastBackup>('GET', '/api/status/last-backup'),
   system: () => request<SystemStatus>('GET', '/api/status/system'),
   watchdog: () => request<WatchdogStatus>('GET', '/api/status/watchdog'),
+  activity: (limit = 3) => request<{ entries: ActivityEntry[] }>('GET', `/api/status/activity?limit=${limit}`).then((r) => r.entries),
   connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
 }
 

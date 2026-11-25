@@ -1,12 +1,5 @@
-// Placeholder values for what the backend cannot deliver yet (calendar connection rows,
-// activity feed). Next alarm, backup alarm, TV, last backup, the watchdog and the Home
+// Placeholder values for what the backend cannot deliver yet (calendar connection rows). Next alarm, backup alarm, TV, last backup, the watchdog and the Home
 // Assistant connections come from apps/api (see api.ts, statusApi).
-
-export const activityFeed = [
-  { time: '20:46', title: 'Watchdog geprüft', detail: 'Alle Dienste antworten.' },
-  { time: '20:30', title: 'Weckplan synchronisiert', detail: 'Nächster Start: morgen, 06:30.' },
-  { time: '18:12', title: 'Updates gefunden', detail: '2 Pakete zur Installation bereit.' },
-]
 
 // Wecker page. Weekdays are 0 = Mo ... 6 = So.
 // Einstellungen page: status only, never addresses, keys or passwords.

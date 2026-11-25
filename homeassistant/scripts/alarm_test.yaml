@@ -9,6 +9,13 @@ alarm_test:
     playlist: spotify:playlist:37i9dQZF1E8N3mKFwU3tJ8
     volume: 0.05
   sequence:
+    # Activity feed (ADR-030): the admin app shows logbook entries named "App: ...".
+    # continue_on_error so a logbook problem can never keep the alarm from ringing.
+    - action: logbook.log
+      continue_on_error: true
+      data:
+        name: "App: Testwecker gestartet"
+        message: "Kinderzimmer, 5 % Lautstärke."
     - action: media_player.volume_set
       target:
         entity_id: "{{ zone }}"
@@ -31,3 +38,10 @@ alarm_test:
     - action: media_player.media_pause
       target:
         entity_id: "{{ zone }}"
+    # wait.completed is true when the speaker was paused (the stop button),
+    # false after the 15-minute timeout.
+    - action: logbook.log
+      continue_on_error: true
+      data:
+        name: "App: Testwecker gestoppt"
+        message: "{{ 'Per Sonos-Taste.' if wait.completed else 'Nach 15 Minuten automatisch.' }}"
