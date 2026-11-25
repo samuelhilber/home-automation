@@ -98,6 +98,15 @@ export const statusApi = {
   connections: () => request<{ connections: Connection[] }>('GET', '/api/status/connections').then((r) => r.connections),
 }
 
+// Updates (ADR-018, ADR-019): Home Assistant's update entities. `blockedUntil` (HH:MM) is set while
+// the night window is closed and nothing may be installed.
+export type PendingUpdate = { id: string; name: string; from: string; to: string; notesUrl: string | null; inProgress: boolean }
+export type UpdatesStatus = { updates: PendingUpdate[]; blockedUntil: string | null }
+export const updatesApi = {
+  list: () => request<UpdatesStatus>('GET', '/api/status/updates'),
+  install: (id: string) => request<{ started: boolean }>('POST', `/api/updates/${encodeURIComponent(id)}/install`),
+}
+
 // Settings (ADR-029). null means Home Assistant does not answer or the helper is missing.
 export type Settings = {
   timeZone: string
@@ -118,7 +127,8 @@ export function describeError(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 502) return 'Home Assistant antwortet nicht. Der Pi ist vermutlich nicht erreichbar.'
     if (err.status === 0) return 'Die Verwaltung (API) ist nicht erreichbar.'
-    if (err.status === 404) return 'Dieser Wecker existiert nicht mehr. Seite neu laden.'
+    if (err.status === 404) return 'Dieser Eintrag existiert nicht mehr. Seite neu laden.'
+    if (err.status === 409) return 'Das geht gerade nicht: ein Update läuft schon oder die Nachtsperre gilt.'
     if (err.status === 400) return `Eingabe nicht gültig: ${err.message}`
   }
   return 'Das hat nicht geklappt. Bitte nochmal versuchen.'

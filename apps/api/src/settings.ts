@@ -101,11 +101,25 @@ const addMinutes = (time: string, minutes: number) => {
 // From 21:00 until 2 hours after the last alarm of tomorrow (10:00 without one) (ADR-019).
 // Public holidays are not looked at: a holiday only makes the window end later, which is the safe side.
 export function installWindow(alarms: Alarm[], states: HaState[], at: Date): { from: string; to: string } {
-  const weekday = weekdayOf(addDays(zurichClock(at).date, 1))
+  return { from: INSTALL_FROM, to: windowEnd(alarms, states, addDays(zurichClock(at).date, 1)) }
+}
+
+// When the window that ends on `date` closes: 2 hours after that day's last alarm, 10:00 without one.
+function windowEnd(alarms: Alarm[], states: HaState[], date: string): string {
+  const weekday = weekdayOf(date)
   const times = alarms.filter((a) => a.on && a.days.includes(weekday)).map((a) => a.time)
   if (stateOf(states, WEEKDAY_ALARM.entity) === 'on' && WEEKDAY_ALARM.days.includes(weekday)) times.push(WEEKDAY_ALARM.time)
   const last = times.sort().at(-1)
-  return { from: INSTALL_FROM, to: last ? addMinutes(last, INSTALL_AFTER_ALARM_MINUTES) : INSTALL_WITHOUT_ALARM_TO }
+  return last ? addMinutes(last, INSTALL_AFTER_ALARM_MINUTES) : INSTALL_WITHOUT_ALARM_TO
+}
+
+// null when an update may run now; otherwise the time (HH:MM) the install window closes (ADR-019).
+// Evening: the window runs to tomorrow's end. Morning: it is still the one that began yesterday at 21:00.
+export function installBlockedUntil(alarms: Alarm[], states: HaState[], at: Date): string | null {
+  const now = zurichClock(at)
+  if (now.time >= INSTALL_FROM) return windowEnd(alarms, states, addDays(now.date, 1))
+  const end = windowEnd(alarms, states, now.date)
+  return now.time < end ? end : null
 }
 
 export function readSettings(store: SettingsStore, states: HaState[], alarms: Alarm[], at: Date): Settings {

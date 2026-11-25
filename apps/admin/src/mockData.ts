@@ -1,5 +1,5 @@
 // Placeholder values for what the backend cannot deliver yet (calendar connection rows,
-// activity feed, updates). Next alarm, backup alarm, TV, last backup, the watchdog and the Home
+// activity feed). Next alarm, backup alarm, TV, last backup, the watchdog and the Home
 // Assistant connections come from apps/api (see api.ts, statusApi).
 
 export const activityFeed = [
@@ -26,20 +26,6 @@ export const connections: Connection[] = [
   { id: 'work', name: 'Outlook Arbeit', state: 'ok', action: 'Trennen' },
   { id: 'school', name: 'Outlook Schule', state: 'none', detail: 'Nicht angemeldet', action: 'Verbinden' },
   { id: 'tailscale', name: 'Tailscale', state: 'ok', detail: 'Zugriff von unterwegs', value: 'aktiv' },
-]
-
-// Updates (made-up versions).
-export type UpdateItem = { id: string; name: string; from: string; to: string; notesUrl: string }
-export type UpdateHistoryItem = { id: string; name: string; from: string; to: string; ok: boolean; date: string }
-
-export const initialPendingUpdates: UpdateItem[] = [
-  { id: 'u1', name: 'Home Assistant Core', from: '2026.10.3', to: '2026.11.0', notesUrl: '#' },
-  { id: 'u2', name: 'HACS Sonos-Helfer', from: '1.4.2', to: '1.5.0', notesUrl: '#' },
-]
-
-export const initialUpdateHistory: UpdateHistoryItem[] = [
-  { id: 'h1', name: 'Home Assistant Core', from: '2026.10.2', to: '2026.10.3', ok: true, date: '02.11.' },
-  { id: 'h2', name: 'Watchdog-Skript', from: '1.1', to: '1.2', ok: false, date: '28.10.' },
 ]
 
 export const DAY_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
