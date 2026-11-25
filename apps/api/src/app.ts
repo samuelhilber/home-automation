@@ -116,7 +116,7 @@ export function buildApp(ha: HaClient, now: () => Date = () => new Date(), probe
   // 10 days like the recorder; the answer is cached for 30 s because the card polls.
   let feedCache: { at: number; entries: Awaited<ReturnType<HaClient['getLogbook']>> } | undefined
   app.get<{ Querystring: { limit?: string } }>('/api/status/activity', async (req) => {
-    const limit = Math.min(100, Math.max(1, Math.floor(Number(req.query.limit ?? 20)) || 20))
+    const limit = Math.min(500, Math.max(1, Math.floor(Number(req.query.limit ?? 20)) || 20))
     if (!feedCache || now().getTime() - feedCache.at > 30_000) {
       feedCache = { at: now().getTime(), entries: await ha.getLogbook(new Date(now().getTime() - 10 * 86400000)) }
     }

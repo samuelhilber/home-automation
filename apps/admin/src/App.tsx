@@ -6,16 +6,18 @@ import OverviewPage from './components/OverviewPage'
 import WeckerPage from './components/WeckerPage'
 import SystemPage from './components/SystemPage'
 import KalenderPage from './components/KalenderPage'
+import ProtokollPage from './components/ProtokollPage'
 import EinstellungenPage from './components/EinstellungenPage'
 import UpdatesDialog from './components/UpdatesDialog'
 import Footer from './components/Footer'
 import { describeError, updatesApi, type UpdatesStatus } from './api'
 import './App.css'
 
-export type PageId = 'overview' | 'wecker' | 'system' | 'kalender' | 'einstellungen'
+export type PageId = 'overview' | 'wecker' | 'system' | 'kalender' | 'einstellungen' | 'protokoll'
 
 const PAGE_LABELS: Record<PageId, string> = {
   einstellungen: 'Einstellungen',
+  protokoll: 'Protokoll',
   overview: 'Übersicht',
   wecker: 'Wecker',
   system: 'System',
@@ -73,8 +75,10 @@ export default function App() {
             <KalenderPage />
           ) : page === 'einstellungen' ? (
             <EinstellungenPage />
+          ) : page === 'protokoll' ? (
+            <ProtokollPage onBack={() => setPage('overview')} />
           ) : (
-            <OverviewPage />
+            <OverviewPage onNavigate={setPage} />
           )}
           <Footer />
         </div>

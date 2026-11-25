@@ -1,0 +1,76 @@
+.log-card {
+  max-width: 760px;
+}
+.log-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.log-tools input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.log-tools small {
+  color: var(--faint);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.log-note {
+  margin: 18px 0 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.log-day h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 26px 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.log-day h2 small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--faint);
+}
+.log-day ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.log-day li {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.log-day time {
+  color: var(--faint);
+  font-size: 11.5px;
+  padding-top: 1px;
+}
+.log-day b {
+  display: block;
+  font-weight: 600;
+}
+.log-day li small {
+  font-size: 11px;
+  color: var(--faint);
+}
+.back svg {
+  transform: scaleX(-1);
+}

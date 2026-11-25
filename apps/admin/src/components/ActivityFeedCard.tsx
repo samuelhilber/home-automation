@@ -3,7 +3,7 @@ import { statusApi } from '../api'
 import { useStatus } from '../useStatus'
 import './ActivityFeedCard.css'
 
-export default function ActivityFeedCard() {
+export default function ActivityFeedCard({ onOpenLog }: { onOpenLog: () => void }) {
   const { data, loaded, failed } = useStatus(() => statusApi.activity(3))
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Zurich' })
   return (
@@ -30,7 +30,7 @@ export default function ActivityFeedCard() {
         {loaded && !failed && data?.length === 0 && <small>Noch nichts aufgezeichnet.</small>}
         {failed && !data && <small>Home Assistant antwortet nicht.</small>}
       </div>
-      <button type="button" className="link">
+      <button type="button" className="link" onClick={onOpenLog}>
         Protokoll öffnen
         <Icon name="arrow-right" />
       </button>
