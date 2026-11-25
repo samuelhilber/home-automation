@@ -4,6 +4,7 @@ import BackupAlarmCard from './BackupAlarmCard'
 import TvCallToActionCard from './TvCallToActionCard'
 import SystemStatusCard from './SystemStatusCard'
 import ActivityFeedCard from './ActivityFeedCard'
+import type { PageId } from '../App'
 import './OverviewPage.css'
 
 const TIME_ZONE = 'Europe/Zurich'
@@ -19,7 +20,7 @@ function useClock() {
   return now
 }
 
-export default function OverviewPage() {
+export default function OverviewPage({ onNavigate }: { onNavigate: (page: PageId) => void }) {
   const now = useClock()
   const systemTime = new Intl.DateTimeFormat('de-DE', {
     timeZone: TIME_ZONE,
@@ -59,7 +60,7 @@ export default function OverviewPage() {
 
       <div className="grid">
         <SystemStatusCard />
-        <ActivityFeedCard />
+        <ActivityFeedCard onOpenLog={() => onNavigate('protokoll')} />
       </div>
     </main>
   )
