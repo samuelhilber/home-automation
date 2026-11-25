@@ -110,7 +110,8 @@ export class HttpHaClient implements HaClient {
   }
 
   async getLogbook(since: Date): Promise<HaLogbookEntry[]> {
-    const res = await this.call('GET', `/api/logbook/${encodeURIComponent(since.toISOString())}`)
+    const res = await this.call('GET', `/api/logbook/${encodeURIComponent(since.toISOString())}?end_time=${encodeURIComponent(new Date().toISOString())}`)
+    // Without end_time Home Assistant answers with one day from `since` only.
     if (!res.ok) return []
     const rows = (await res.json()) as { when?: unknown; name?: unknown; message?: unknown }[]
     return rows.flatMap((r) =>
