@@ -5,6 +5,7 @@ export type HaAutomation = { configId: string; on: boolean; config: AutomationCo
 
 export type HaState = { entity_id: string; state: string; attributes: Record<string, any> }
 export type HaForecastDay = { datetime: string; condition?: string; temperature?: number; templow?: number; precipitation?: number; wind_speed?: number }
+export type HaLogbookEntry = { when: string; name: string; message: string }
 export type HaConfigEntry = { domain: string; title: string; state: string; disabled_by: string | null }
 
 // Everything the alarm routes need from Home Assistant, so tests can swap in a fake.
@@ -17,6 +18,8 @@ export interface HaClient {
   getStates(): Promise<HaState[]>
   getDailyForecast(weatherEntity: string): Promise<HaForecastDay[]>
   listConfigEntries(): Promise<HaConfigEntry[]>
+  // Logbook entries from `since` until now (ADR-030), oldest first.
+  getLogbook(since: Date): Promise<HaLogbookEntry[]>
   // Calls a service without a response (the settings helpers, ADR-029). Throws if Home Assistant refuses.
   callService(domain: string, service: string, data: Record<string, unknown>): Promise<void>
   // Asks the Workday sensor about a date (YYYY-MM-DD). Answers true when in doubt.
@@ -104,6 +107,17 @@ export class HttpHaClient implements HaClient {
 
   async listConfigEntries(): Promise<HaConfigEntry[]> {
     return (await (await this.call('GET', '/api/config/config_entries/entry')).json()) as HaConfigEntry[]
+  }
+
+  async getLogbook(since: Date): Promise<HaLogbookEntry[]> {
+    const res = await this.call('GET', `/api/logbook/${encodeURIComponent(since.toISOString())}`)
+    if (!res.ok) return []
+    const rows = (await res.json()) as { when?: unknown; name?: unknown; message?: unknown }[]
+    return rows.flatMap((r) =>
+      typeof r.when === 'string' && typeof r.name === 'string'
+        ? [{ when: r.when, name: r.name, message: typeof r.message === 'string' ? r.message : '' }]
+        : [],
+    )
   }
 
   async callService(domain: string, service: string, data: Record<string, unknown>): Promise<void> {

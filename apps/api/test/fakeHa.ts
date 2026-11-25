@@ -5,6 +5,7 @@ import {
   type HaClient,
   type HaConfigEntry,
   type HaForecastDay,
+  type HaLogbookEntry,
   type HaState,
 } from '../src/ha.ts'
 
@@ -13,6 +14,7 @@ export class FakeHa implements HaClient {
   states: HaState[] = []
   forecast: HaForecastDay[] = []
   entries: HaConfigEntry[] = []
+  logbook: HaLogbookEntry[] = []
   holidays = new Set<string>()
   down = false
   private check() {
@@ -45,6 +47,10 @@ export class FakeHa implements HaClient {
   async listConfigEntries() {
     this.check()
     return this.entries
+  }
+  async getLogbook() {
+    this.check()
+    return this.logbook
   }
   calls: { domain: string; service: string; data: Record<string, unknown> }[] = []
   async callService(domain: string, service: string, data: Record<string, unknown>) {

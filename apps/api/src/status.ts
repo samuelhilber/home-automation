@@ -1,5 +1,5 @@
 import type { Alarm } from './alarm.ts'
-import type { HaClient, HaState } from './ha.ts'
+import type { HaClient, HaLogbookEntry, HaState } from './ha.ts'
 import { BACKUP_ALARM, ENTITIES, PLACE, WEEKDAY_ALARM } from './mapping.ts'
 import { addDays, weekdayOf, zurichClock } from './time.ts'
 
@@ -219,4 +219,23 @@ export function lastBackup(states: HaState[]): LastBackup {
     next: known(find(states, ENTITIES.backupNext)),
     running: find(states, ENTITIES.backupState)?.state === 'create_backup',
   }
+}
+
+// --- activity feed (ADR-030) ----------------------------------------------
+
+// Automations write feed lines with `logbook.log`, name "App: <title>", message <detail>.
+export const FEED_PREFIX = 'App: '
+
+export type Activity = { date: string; time: string; title: string; detail: string }
+
+// Only our entries, newest first. Everything else in the logbook is entity noise.
+export function activity(entries: HaLogbookEntry[], limit: number): Activity[] {
+  return entries
+    .filter((e) => e.name.startsWith(FEED_PREFIX) && e.name.length > FEED_PREFIX.length)
+    .sort((a, b) => Date.parse(b.when) - Date.parse(a.when))
+    .slice(0, limit)
+    .map((e) => {
+      const clock = zurichClock(new Date(e.when))
+      return { ...clock, title: e.name.slice(FEED_PREFIX.length), detail: e.message }
+    })
 }

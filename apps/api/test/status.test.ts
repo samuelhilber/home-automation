@@ -219,3 +219,25 @@ describe('system', () => {
     expect(await system(withProbe(reading))).toMatchObject({ probe: true, homeAssistant: false })
   })
 })
+
+describe('activity feed', () => {
+  it('keeps only App: entries, newest first, with Zurich time', async () => {
+    const ha = new FakeHa()
+    ha.logbook = [
+      { when: '2026-11-25T19:46:00+00:00', name: 'App: Wecker gestoppt', message: 'Per Sonos-Taste.' },
+      { when: '2026-11-25T20:00:00+00:00', name: 'Sonos Arc', message: 'changed to playing' },
+      { when: '2026-11-26T05:30:00+00:00', name: 'App: Wecker gestartet', message: '06:30 Uhr' },
+    ]
+    const res = await buildApp(ha).inject({ method: 'GET', url: '/api/status/activity?limit=5' })
+    expect(res.json().entries).toEqual([
+      { date: '2026-11-26', time: '06:30', title: 'Wecker gestartet', detail: '06:30 Uhr' },
+      { date: '2026-11-25', time: '20:46', title: 'Wecker gestoppt', detail: 'Per Sonos-Taste.' },
+    ])
+  })
+  it('answers 502 when Home Assistant is down', async () => {
+    const ha = new FakeHa()
+    ha.down = true
+    const res = await buildApp(ha).inject({ method: 'GET', url: '/api/status/activity' })
+    expect(res.statusCode).toBe(502)
+  })
+})
